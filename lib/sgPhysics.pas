@@ -684,21 +684,12 @@ implementation
   ///
   /// @returns          True if the bitmaps collide.
   /// 
-  function CollisionWithinBitmapImages(
-             bmp1: Bitmap; x1, y1: Single; w1, h1: LongInt; offsetX1, offsetY1: Single; //bbox1: Boolean;
-             bmp2: Bitmap; x2, y2: Single; w2, h2: LongInt; offsetX2, offsetY2: Single //bbox2: Boolean
-           ): Boolean; overload;
-  begin
-    result := CollisionWithinBitmapImages(
-      bmp1, Round(x1), Round(y1), w1, h1, Round(offsetX1), Round(offsetY1),
-      bmp2, Round(x2), Round(y2), w2, h2, Round(offsetX2), Round(offsetY2));
-  end;
   
   // offset... are the part 
-  function CollisionWithinBitmapImages(
+  function CollisionWithinBitmapImagesInt(
              bmp1: Bitmap; x1, y1, w1, h1, offsetX1, offsetY1: LongInt; //bbox1: Boolean;
              bmp2: Bitmap; x2, y2, w2, h2, offsetX2, offsetY2: LongInt //bbox2: Boolean
-           ): Boolean; overload;
+           ): Boolean;
   var
     left1, left2, overLeft: LongInt;
     right1, right2, overRight: LongInt;
@@ -752,6 +743,16 @@ implementation
     end;
   end;
 
+  function CollisionWithinBitmapImages(
+             bmp1: Bitmap; x1, y1: Single; w1, h1: LongInt; offsetX1, offsetY1: Single; //bbox1: Boolean;
+             bmp2: Bitmap; x2, y2: Single; w2, h2: LongInt; offsetX2, offsetY2: Single //bbox2: Boolean
+           ): Boolean; overload;
+  begin
+    result := CollisionWithinBitmapImagesInt(
+      bmp1, Round(x1), Round(y1), w1, h1, Round(offsetX1), Round(offsetY1),
+      bmp2, Round(x2), Round(y2), w2, h2, Round(offsetX2), Round(offsetY2));
+  end;
+  
   /// Performs a collision detection within two bitmaps at the given x, y
   /// locations using per pixel collision detection. This checks to see if
   /// two non-transparent pixels collide.

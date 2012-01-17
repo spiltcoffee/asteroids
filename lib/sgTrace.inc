@@ -1,0 +1,5 @@
+
+{$DEFINE TRACE}
+{$IFDEF FPC}
+  {$PACKENUM 4}
+{$ENDIF}

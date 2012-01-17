@@ -1,0 +1,9 @@
+BITMAP,SwinGame,SwinGame.jpg
+BITMAP,Swinburne,Swinburne.jpg
+BITMAP,SplashBack,SplashBack.jpg
+BITMAP,SwinGameAni,SwinGameAni.jpg,546,327,2,6,11
+BITMAP,LoaderEmpty,loader_empty.png
+BITMAP,LoaderFull,loader_full.png
+FONT,LoadingFont,arial.ttf,12
+FONT,ArialLarge,arial.ttf,18
+ANIM,Startup,startup.txt

@@ -1,2 +1,0 @@
-BITMAP,MyLogo,MyLogo.png
-SOUND,eh,logo.wav

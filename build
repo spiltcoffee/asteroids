@@ -21,7 +21,7 @@ APP_PATH=`cd "$APP_PATH"; pwd`
 cd "$APP_PATH"
 
 #Set the basic paths
-OUT_DIR="${APP_PATH}/bin"
+OUT_DIR="${APP_PATH}/../asteroids.out/master"
 TMP_DIR="${APP_PATH}/tmp"
 SRC_DIR="${APP_PATH}/src"
 LIB_DIR="${APP_PATH}/lib"

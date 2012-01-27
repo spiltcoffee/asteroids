@@ -1,2 +1,4 @@
+rm -f out.log
+rm -f Trace.log
 build.sh
-rm -r tmp
+rm -f -r tmp

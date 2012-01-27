@@ -72,11 +72,7 @@ if [ "a${DEBUG}a" != "aa" ]; then
     else
         PAS_FLAGS="-g -vw"
     fi
-    OUT_DIR="${OUT_DIR}/Debug"
-    TMP_DIR="${TMP_DIR}/Debug"
-else
-    OUT_DIR="${OUT_DIR}/Release"
-    TMP_DIR="${TMP_DIR}/Release"
+    OUT_DIR="${OUT_DIR}.debug"
 fi
 
 if [ ! -d ${TMP_DIR} ]; then

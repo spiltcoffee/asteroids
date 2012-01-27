@@ -1,0 +1,22 @@
+Free Pascal Compiler version 2.6.0 [2011/12/25] for i386
+Copyright (c) 1993-2011 by Florian Klaempfl and others
+Target OS: Win32 for i386
+Compiling d:\Temp\asteroids\src\GameMain.pas
+Compiling D:\Temp\asteroids\lib\sgCore.pas
+Compiling D:\Temp\asteroids\lib\sgTypes.pas
+Compiling D:\Temp\asteroids\lib\sdl_mixer.pas
+Compiling D:\Temp\asteroids\lib\smpeg.pas
+Compiling D:\Temp\asteroids\lib\sdl.pas
+Compiling D:\Temp\asteroids\lib\sdl_image.pas
+Compiling D:\Temp\asteroids\lib\sdl_ttf.pas
+Compiling D:\Temp\asteroids\lib\sgShared.pas
+Compiling D:\Temp\asteroids\lib\stringhash.pas
+Compiling D:\Temp\asteroids\lib\hashtable.pas
+Compiling D:\Temp\asteroids\lib\comparable.pas
+Compiling D:\Temp\asteroids\lib\sgEventProcessing.pas
+Compiling D:\Temp\asteroids\lib\sgCore.pas
+Compiling D:\Temp\asteroids\lib\sdl_gfx.pas
+Compiling D:\Temp\asteroids\lib\sgSavePNG.pas
+Fatal: Can't find unit png used by sgSavePNG
+Fatal: Compilation aborted
+Error: b:\Tools\FPC\bin\i386-win32\ppc386.exe returned an error exitcode (normal if you did not specify a source file to be compiled)

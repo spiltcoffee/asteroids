@@ -36,7 +36,7 @@ implementation
       name := '';
       submitscore := true;
       lives := 3;
-      next := PLAYER_LIFE_INTERVAL;
+      next := PLAYER_LIFE_INTERVAL; //next life
       enemylives := 0;
       enemynext := Trunc(state.density * ENEMY_LIFE_INTERVAL_BASE) + Rnd(Trunc(state.density * ENEMY_LIFE_INTERVAL_VAR)) + 1 - Trunc(state.density * ENEMY_LIFE_INTERVAL_VAR) div 2;
       density := STATE_START_DENSITY;

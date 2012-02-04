@@ -18,6 +18,7 @@ interface
 
 implementation
   uses sgCore, sgGraphics, asConstants, asAsteroids, asEnemy, asMenu, asPlayer, asState, Sysutils;
+
   procedure StartGame(var state: TState; var menu: TMenu; var player, enemy: TShip; var asteroids: TAsteroidArray; var bullets: TBulletArray; var debris: TDebrisArray; var notes: TNoteArray); overload;
   begin
     SetupState(state);

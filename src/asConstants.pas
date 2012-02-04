@@ -9,8 +9,8 @@ interface
     SHAKE_FACTOR = 6; //+- 1 around this value will be used
     COLLISION_MODIFIER = 40;
 
-    STATE_START_DENSITY = 2000; //pixels per radii
-    STATE_END_DENSITY = 1000; //player should have to destroy 1000 asteroids before density maxes out
+    STATE_START_DENSITY = 1000; //pixels per radii
+    STATE_END_DENSITY = 500; //player should have to destroy 1000 asteroids before density maxes out
     STATE_PLAYERMOVEDIST = 200; //pixels from player until score and lives will be moved
     STATE_FADE_TIME = 30;
 

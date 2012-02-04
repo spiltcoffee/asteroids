@@ -23,11 +23,11 @@ begin
 
   SetupAudio(state);
 
-  OpenGraphicsWindow('Asteroids', state.res.width, state.res.height, state.fullscreen, true, false);
+  OpenGraphicsWindow('Asteroids', state.res.width, state.res.height, state.fullscreen, true, false, true);
   ShowMyLogo();
   
   SetupGame(state,menu,player,enemy,asteroids,bullets,debris,notes);
-
+  
   repeat // The game loop...
     GameProcessEvents(state,menu);
     CreateObjects(state,menu,player,enemy,asteroids,bullets);
@@ -42,5 +42,5 @@ begin
 end;
 
 begin
-  Main();;;
+  Main();
 end.

@@ -151,7 +151,7 @@ interface
   /// @lib
   /// @uname OpenGraphicsWindow
   /// @sn openGraphicsWindow:%s width:%s height:%s
-  procedure OpenGraphicsWindow(caption: String; width, height: LongInt; fullscreen, border, mouse: Boolean); overload;
+  procedure OpenGraphicsWindow(caption: String; width, height: LongInt; fullscreen, border, mouse, logo: Boolean); overload;
 
   /// Opens the graphical window as an 800 x 600 window. See OpenGramhicsWinddow
   /// for more options.
@@ -655,7 +655,7 @@ implementation
     {$ENDIF}
   end;
   
-  procedure OpenGraphicsWindow(caption: String; width: LongInt; height: LongInt; fullscreen, border, mouse: Boolean); overload;
+  procedure OpenGraphicsWindow(caption: String; width: LongInt; height: LongInt; fullscreen, border, mouse, logo: Boolean); overload;
   begin
     {$IFDEF TRACE}
       TraceEnter('sgCore', 'OpenGraphicsWindow', caption + ': W' + IntToStr(width) + ': H' + IntToStr(height));
@@ -708,7 +708,8 @@ implementation
       ToggleWindowBorder();
     ShowMouse(mouse);
     
-    ShowLogos();
+	if logo then
+		ShowLogos();
     LoadResourceBundle('FileDialog.txt');
     {$IFDEF TRACE}
       TraceExit('sgCore', 'OpenGraphicsWindow');
@@ -721,7 +722,7 @@ implementation
     {$IFDEF TRACE}
       TraceEnter('sgCore', 'OpenGraphicsWindow');
     {$ENDIF}
-    OpenGraphicsWindow(caption, 800,600, false, true, true);
+    OpenGraphicsWindow(caption, 800,600, false, true, true, true);
     {$IFDEF TRACE}
       TraceExit('sgCore', 'OpenGraphicsWindow');
     {$ENDIF}

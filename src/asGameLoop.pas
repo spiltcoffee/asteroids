@@ -161,8 +161,12 @@ implementation
         //set i and j in collision count array to +1
       //end
       
+      
+      
       //while
-        //precise check, determine if hit
+        //precise check, determine if asteroids actually collided
+          //if collided, leave in array
+          //if not collided, set i and j collision count array to +1
         
       
       //asteroid collide asteroid

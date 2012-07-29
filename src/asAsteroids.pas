@@ -7,13 +7,14 @@ interface
 
   procedure DestroyAsteroid(var asteroids: TAsteroidArray; const del: Integer; const collision: Point2D; var debris: TDebrisArray); overload;
   procedure DestroyAsteroid(var asteroids: TAsteroidArray; const del: Integer; const collision: Point2D; var state: TState; var debris: TDebrisArray; var notes: TNoteArray); overload;
+  procedure DestroyTwoAsteroids(var asteroids: TAsteroidArray; const del1: Integer; const del2: Integer; const collision: Point2D; var debris: TDebrisArray);
   
   procedure MoveAsteroid(var asteroid: TAsteroid);
   
   procedure DrawAsteroid(asteroid: TAsteroid);
   
 implementation
-  uses sgCore, sgGeometry, asConstants, asDraw, asEffects, asExtras, asNotes, asOffscreen;
+  uses sgCore, sgGeometry, asConstants, asDraw, asEffects, asExtras, asNotes, asOffscreen, asState, Math;
 
   function GenerateAsteroid(maxsize: Integer = -1): TAsteroid;
   var
@@ -37,7 +38,7 @@ implementation
       result.rad += amplitude;
     end;
     
-    result.vel := VectorFromAngle(Rnd(180),Rnd() - 0.5);
+    result.vel := VectorFromAngle(Rnd(180),(Rnd() - 0.5) * ASTEROID_SPEED_MULTIPLIER);
     result.rad := round(result.rad / maxpoints);
     
     result.rot.angle := 0;
@@ -98,11 +99,16 @@ implementation
     score := (score - (score mod 100)) div 10;
     state.score += score;
     CreateScore(notes,score,asteroids[del]);
-    
-    if state.density > STATE_END_DENSITY then
-      state.density -= 5;
 
     DestroyAsteroid(asteroids,del,collision,debris);
+  end;
+  
+  //Destroy the asteroid that's further in the array first to prevent the other from shifting position.
+  //I'm lazy, what's new?
+  procedure DestroyTwoAsteroids(var asteroids: TAsteroidArray; const del1: Integer; const del2: Integer; const collision: Point2D; var debris: TDebrisArray);
+  begin
+    DestroyAsteroid(asteroids, Max(del1, del2), collision, debris);
+    DestroyAsteroid(asteroids, Min(del1, del2), collision, debris);
   end;
 
   procedure MoveAsteroid(var asteroid: TAsteroid);

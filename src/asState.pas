@@ -3,7 +3,7 @@ unit asState;
 interface
   uses asTypes;
 
-  function NeedMoreAsteroids(const density: Double; const asteroids: TAsteroidArray): Boolean;
+  function NeedMoreAsteroids(const score: Integer; const asteroids: TAsteroidArray): Boolean;
   
   procedure SetupState(var state: TState);
   
@@ -12,16 +12,16 @@ interface
   procedure DrawState(const state: TState);
 
 implementation
-  uses sgCore, sgGeometry, sgGraphics, sgText, sgTypes, asConstants, asDraw, asNotes, Sysutils;
-  function NeedMoreAsteroids(const density: Double; const asteroids: TAsteroidArray): Boolean;
-  var
-    totalAsteroidRadius: Double;
-    i: Integer;
+  uses sgCore, sgGeometry, sgGraphics, sgText, sgTypes, asConstants, asDraw, asNotes, SysUtils, Math;
+
+  function GetTargetAsteroidCount(const score: Integer): Integer;
   begin
-    totalAsteroidRadius := 0;
-    for i := 0 to High(asteroids) do
-      totalAsteroidRadius += asteroids[i].rad;
-    result := (Round((ScreenWidth() * ScreenHeight()) / density) > totalAsteroidRadius);
+	result := {Min(Trunc(score / (STATE_ASTEROID_SCORE_INTERVAL)) + ASTEROID_MINCOUNT, }ASTEROID_MAXCOUNT{)};
+  end;
+  
+  function NeedMoreAsteroids(const score: Integer; const asteroids: TAsteroidArray): Boolean;
+  begin
+    result := Length(asteroids) < GetTargetAsteroidCount(score);
   end;
 
   procedure SetupState(var state: TState);
@@ -38,8 +38,7 @@ implementation
       lives := 3;
       next := PLAYER_LIFE_INTERVAL; //next life
       enemylives := 0;
-      enemynext := Trunc(state.density * ENEMY_LIFE_INTERVAL_BASE) + Rnd(Trunc(state.density * ENEMY_LIFE_INTERVAL_VAR)) + 1 - Trunc(state.density * ENEMY_LIFE_INTERVAL_VAR) div 2;
-      density := STATE_START_DENSITY;
+      enemynext := ENEMY_SPAWN_INTERVAL;
       pos.x := 20;
       pos.y := 35;
       transition := NoFade;
@@ -67,7 +66,7 @@ implementation
     if state.enemynext < state.score then
     begin
       state.enemylives += 1;
-      state.enemynext := state.score + Trunc(state.density * ENEMY_LIFE_INTERVAL_BASE) + Rnd(Trunc(state.density * ENEMY_LIFE_INTERVAL_VAR)) + 1 - Trunc(state.density * ENEMY_LIFE_INTERVAL_VAR) div 2;
+      state.enemynext += ENEMY_SPAWN_INTERVAL;
     end;
     
     if state.time > 0 then

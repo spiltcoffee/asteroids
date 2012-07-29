@@ -39,7 +39,7 @@ implementation
     
     SetLength(asteroids,0);
     
-    while NeedMoreAsteroids(state.density,asteroids) do
+    while NeedMoreAsteroids(state.score, asteroids) do
       CreateAsteroid(asteroids,player);
     
     SetLength(bullets,0);
@@ -67,7 +67,7 @@ implementation
     
     SetLength(asteroids,0);
     
-    while NeedMoreAsteroids(state.density,asteroids) do
+    while NeedMoreAsteroids(state.score, asteroids) do
       CreateAsteroid(asteroids,player);
     
     SetLength(bullets,0);

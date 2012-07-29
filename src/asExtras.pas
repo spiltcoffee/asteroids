@@ -10,6 +10,7 @@ interface
   procedure Remove(var array_in: TMenuItemArray; index: integer); overload;
 
 implementation
+
   procedure Remove(var array_in: TAsteroidArray; index: integer); overload;
   var
     i: integer;

@@ -7,7 +7,7 @@
 
 program GameMain;
 {$IFNDEF UNIX} {$r GameLauncher.res} {$ENDIF}
-uses sgCore, sgResources, asAudio, asGameLoop, asLogo, asMenuCommands, asTypes;
+uses sgCore, sgResources, asAudio, asConstants, asGameLoop, asLogo, asMenuCommands, asTypes;
 
 procedure Main();
 var
@@ -34,7 +34,7 @@ begin
     CollideObjects(state,player,enemy,asteroids,bullets,debris,notes);
     MoveGame(state,menu,player,enemy,asteroids,bullets,debris,notes);
     DrawGame(state,menu,player,enemy,asteroids,bullets,debris,notes);
-    RefreshScreen(30);
+    RefreshScreen(FRAMES_PER_SECOND);
   until WindowCloseRequested() or state.quit;
 
   EndAudio();

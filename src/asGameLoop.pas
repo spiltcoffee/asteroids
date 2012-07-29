@@ -18,7 +18,9 @@ interface
 implementation
   uses sgCamera, sgCore, sgGeometry, sgGraphics, sgInput, sgTypes, asAsteroids, asAudio,
        asCollisions, asConstants, asDraw, asEnemy, asEffects, asExtras, asMenu, asNotes,
-       asPlayer, asState;
+       asPlayer, asState
+       
+       ,SysUtils{REMOVE};
 
   procedure GameProcessEvents(var state: TState; var menu: TMenu);
   begin
@@ -67,7 +69,7 @@ implementation
     
     SetLength(asteroids,0);
     
-    while NeedMoreAsteroids(state.density,asteroids) do
+    while NeedMoreAsteroids(state.score, asteroids) do
       CreateAsteroid(asteroids,player);
     
     SetLength(bullets,0);
@@ -95,7 +97,7 @@ implementation
         end;
       end;
 
-      while NeedMoreAsteroids(state.density,asteroids) do
+      while NeedMoreAsteroids(state.score, asteroids) do
         CreateAsteroid(asteroids,player,true);
 
       if player.alive and (player.int = 0) and KeyDown(VK_SPACE) then
@@ -120,7 +122,7 @@ implementation
   
   procedure CollideObjects(var state: TState; var player, enemy: TShip; var asteroids: TAsteroidArray; var bullets: TBulletArray; var debris: TDebrisArray; var notes: TNoteArray);
   var
-    i, j: Integer;
+    i, j, last: Integer;
   begin
     if not state.paused then
     begin
@@ -130,6 +132,7 @@ implementation
         Collide(player,enemy);
         PlayCollisionEffect(state);
         CreateSparks(debris,4,FindCollisionPoint(player.pos,player.rad,enemy.pos,ENEMY_RADIUS_OUT));
+
         if (player.shields < 0) then
         begin
           PlayShipExplodeEffect(state);
@@ -138,6 +141,7 @@ implementation
         end
         else if (player.respawn = 0) then
           PlayAlarmEffect(state);
+
         if (enemy.shields <= 0) then
         begin
           PlayShipExplodeEffect(state);
@@ -146,21 +150,73 @@ implementation
           KillEnemy(enemy,state,debris,notes);
         end;
       end;
-
+      
+      //initialise possible collision array
+      //initialise collision count array
+      
+      //while
+        //imprecise check, look for possible collisions
+          //store the positions in array of the two asteroids in possible collision list
+          //set collisioncount to +1
+        //set i and j in collision count array to +1
+      //end
+      
+      //while
+        //precise check, determine if hit
+        
+      
       //asteroid collide asteroid
-      for i := 0 to (High(asteroids) - 1) do
+    try
+      while i < Length(asteroids) - 1 do
+      i := 0;
       begin
-        for j := (i + 1) to High(asteroids) do
+        j := i + 1;
+        while j < Length(asteroids) do
         begin
           if PointPointDistance(asteroids[i].pos, asteroids[j].pos) <= (asteroids[i].rad + asteroids[j].rad) then
           begin
             if (asteroids[i].last <> j) and (asteroids[j].last <> i) then
             begin
-              Collide(asteroids[i],asteroids[j]);
-              PlayCollisionEffect(state);
-              CreateSparks(debris,4,FindCollisionPoint(asteroids[i].pos,asteroids[i].rad,asteroids[j].pos,asteroids[j].rad));
-              asteroids[i].last := j;
-              asteroids[j].last := i;
+              //check asteroid[i] to make sure it won't instantly collide with it's last asteroid
+              if (asteroids[i].last > -1) and (PointPointDistance(asteroids[i].pos, asteroids[asteroids[i].last].pos) <= (asteroids[i].rad + asteroids[asteroids[i].last].rad)) then
+              begin
+                last := asteroids[i].last; //keep it for later
+                DestroyTwoAsteroids(asteroids, i, last, FindCollisionPoint(asteroids[i].pos,asteroids[i].rad,asteroids[last].pos,asteroids[last].rad), debris);
+           
+                //I could explain what this does, or you could just nod, smile, and accept that this prevents access violations from occurring
+                if asteroids[asteroids[last].last].last = last then
+                  asteroids[asteroids[last].last].last := -1;
+           
+           
+                if i > last then //move back one if the other one we removed was before i
+                  i -= 1;
+                
+                //start the next loop of j
+                j := i;
+              end
+              //check asteroid[j] to make sure it won't instantly collide with it's last asteroid
+              else if (asteroids[j].last > -1) and (PointPointDistance(asteroids[j].pos, asteroids[asteroids[j].last].pos) <= (asteroids[j].rad + asteroids[asteroids[j].last].rad)) then 
+              begin
+                last := asteroids[j].last;
+                DestroyTwoAsteroids(asteroids, j, last, FindCollisionPoint(asteroids[j].pos,asteroids[j].rad,asteroids[last].pos,asteroids[last].rad), debris);
+           
+                //And again. Nod, smile, accept. Easy :)
+                if asteroids[asteroids[last].last].last = last then
+                  asteroids[asteroids[last].last].last := -1;
+           
+                if i > last then //move back one if the other one we removed was before i
+                  i -= 1;
+                if j > last then //move back one if the other one we removed was before j
+                  i -= 1;
+              end
+              else
+              begin
+                Collide(asteroids[i],asteroids[j]);
+                PlayCollisionEffect(state);
+                CreateSparks(debris,4,FindCollisionPoint(asteroids[i].pos,asteroids[i].rad,asteroids[j].pos,asteroids[j].rad));
+                asteroids[i].last := j;
+                asteroids[j].last := i;
+              end
             end
           end
           else if (asteroids[i].last = j) and (asteroids[j].last = i) then
@@ -168,8 +224,20 @@ implementation
             asteroids[i].last := -1;
             asteroids[j].last := -1;
           end;
+          j += 1;
         end;
+        i += 1;
       end;
+    except
+      on E: Exception do
+      begin
+        WriteLn('Exception Caught! (You silly duffer!)');
+        WriteLn('i = ' + IntToStr(i));
+        WriteLn('i.last = ' + IntToStr(asteroids[i].last));
+        WriteLn('j = ' + IntToStr(j));
+        WriteLn('j.last = ' + IntToStr(asteroids[j].last));
+      end;
+    end;
 
       //asteroid collide player, asteroid collide enemy, asteroid collide bullet
       i := 0;

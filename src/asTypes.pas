@@ -57,7 +57,6 @@ interface
       next: Integer; //points for next life
       enemylives: Integer;
       enemynext: Integer; //points for next enemy
-      density: Double; //pixels per asteroid
       pos: Point2D; //for drawing things
     end;
 

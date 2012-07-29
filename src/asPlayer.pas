@@ -12,7 +12,6 @@ interface
   procedure KillPlayer(var player: TShip; var state: TState; var debris: TDebrisArray; var notes: TNoteArray);
   
   procedure MovePlayer(var player: TShip; const state: TState);
-  procedure MovePlayer(var player: TShip; const state: TState; var asteroids: TAsteroidArray);
   
   procedure DrawPlayer(const player: TShip);  
 
@@ -81,9 +80,9 @@ implementation
   procedure MovePlayer(var player: TShip; const state: TState);
   begin
     if KeyDown(VK_LEFT) and not KeyDown(VK_RIGHT) then
-      player.rot -= 5
+      player.rot -= PLAYER_ROTATION_SPEED
     else if KeyDown(VK_RIGHT) and not KeyDown(VK_LEFT) then
-      player.rot += 5;
+      player.rot += PLAYER_ROTATION_SPEED;
     
     if player.rot < 0 then
       player.rot += 360
@@ -110,15 +109,6 @@ implementation
       
     if player.int > 0 then
       player.int -= 1;
-  end;
-
-  //AI version
-  procedure MovePlayer(var player: TShip; const state: TState; var asteroids: TAsteroidArray);
-  begin
-    //avoid asteroids
-    //keep speed down
-    //move t
-    //shoot at asteroids
   end;
 
   procedure DrawPlayer(const player: TShip);

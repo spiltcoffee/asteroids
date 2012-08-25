@@ -3,6 +3,11 @@ unit asCollisions;
 interface
   uses sgTypes, asTypes;
   
+  function PreviouslyCollided(ignoreCollision: TCollisionArray; i, j: Integer): Boolean;
+  
+  function ImpreciseCheck(var asteroid1: TAsteroid; var asteroid2: TAsteroid): Boolean;
+  function PreciseCheck(var asteroid1: TAsteroid; var asteroid2: TAsteroid): Boolean;
+  
   procedure ShakeScreen();
   
   procedure Collide(var asteroid1: TAsteroid; var asteroid2: TAsteroid); overload;
@@ -14,6 +19,43 @@ interface
 implementation
   uses sgCamera, sgCore, sgGeometry, asConstants;
 
+  function PreviouslyCollided(ignoreCollision: TCollisionArray; i, j: Integer): Boolean;
+  var
+    cur: Integer;
+  begin
+    result := false;
+    for cur := 0 to High(ignoreCollision) do begin
+      if ((ignoreCollision[cur].i = i) and (ignoreCollision[cur].j = j)) or
+         ((ignoreCollision[cur].i = j) and (ignoreCollision[cur].j = i)) then
+      begin
+        result := true;
+        Break;
+      end;
+    end;
+  end;
+  
+  function ImpreciseCheck(var asteroid1: TAsteroid; var asteroid2: TAsteroid): Boolean;
+  begin
+    result := PointPointDistance(asteroid1.pos, asteroid2.pos) <= (asteroid1.rad + asteroid2.rad);
+  end;
+  
+  function PreciseCheck(var asteroid1: TAsteroid; var asteroid2: TAsteroid): Boolean;
+  var
+    i, j: Integer;
+    line: LineSegment;
+  begin
+    result := false;
+    for i := 0 to High(asteroid1.point) - 1 do begin
+      line := LineFrom(asteroid1.pos + asteroid1.point[i], asteroid1.pos + asteroid1.point[i + 1]);
+      for j := 0 to High(asteroid2.point) - 1 do begin
+        if LineSegmentsIntersect(line, LineFrom(asteroid2.pos + asteroid2.point[j], asteroid2.pos + asteroid2.point[j + 1])) then begin
+          result := true;
+          Break;
+        end;
+      end;
+    end;
+  end;
+  
   procedure ShakeScreen();
   begin
     SetCameraX(SHAKE_FACTOR + Rnd(3) - 1);

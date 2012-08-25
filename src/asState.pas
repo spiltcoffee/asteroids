@@ -16,7 +16,7 @@ implementation
 
   function GetTargetAsteroidCount(const score: Integer): Integer;
   begin
-	result := {Min(Trunc(score / (STATE_ASTEROID_SCORE_INTERVAL)) + ASTEROID_MINCOUNT, }ASTEROID_MAXCOUNT{)};
+	result := Min(Trunc(score / (STATE_ASTEROID_SCORE_INTERVAL)) + ASTEROID_MINCOUNT, ASTEROID_MAXCOUNT);
   end;
   
   function NeedMoreAsteroids(const score: Integer; const asteroids: TAsteroidArray): Boolean;

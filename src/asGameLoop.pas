@@ -20,7 +20,7 @@ implementation
        asCollisions, asConstants, asDraw, asEnemy, asEffects, asExtras, asMenu, asNotes,
        asPlayer, asState
        
-       ,SysUtils{REMOVE};
+       {REMOVE}, SysUtils;
 
   procedure GameProcessEvents(var state: TState; var menu: TMenu);
   begin
@@ -122,7 +122,10 @@ implementation
   
   procedure CollideObjects(var state: TState; var player, enemy: TShip; var asteroids: TAsteroidArray; var bullets: TBulletArray; var debris: TDebrisArray; var notes: TNoteArray);
   var
-    i, j, last: Integer;
+    i, j, new, cur, del: Integer;
+    ignoreCollision, collision: TCollisionArray;
+    collisionCount, destroy: array of Integer;
+    collisionPoint: Point2D;
   begin
     if not state.paused then
     begin
@@ -151,26 +154,137 @@ implementation
         end;
       end;
       
-      //initialise possible collision array
+      ///                 ///
+      //ASTEROID COLLISIONS//
+      ///                 ///
+      
+      //initialise new ignore collision array
+      SetLength(ignoreCollision, 0);
+      //initialise collision array
+      SetLength(collision, 0);
       //initialise collision count array
+      SetLength(collisionCount,Length(asteroids));
+      for cur := 0 to High(collisionCount) do begin
+        collisionCount[cur] := 0;
+      end;
+      //initialise destroy array
+      SetLength(destroy,0);
       
-      //while
-        //imprecise check, look for possible collisions
-          //store the positions in array of the two asteroids in possible collision list
-          //set collisioncount to +1
-        //set i and j in collision count array to +1
-      //end
+      //while i < asteroids.length
+      for i := 0 to High(asteroids) - 1 do begin
+        //while j = i + 1; j < asteroids.length
+        j := i + 1;
+        for j := i + 1 to High(asteroids) do begin
+          //imprecise check (i, j) - look for possible collisions
+          //also check that i and j are not in the ignore collision array
+          if ImpreciseCheck(asteroids[i], asteroids[j]) then begin
+            if not PreviouslyCollided(state.ignoreCollision, i, j) then begin
+              //store (i, j) in collision array
+              SetLength(collision, Length(collision) + 1);
+              new := High(collision);
+              collision[new].i := i;
+              collision[new].j := j;
+              //set i and j in collision count array to +1
+              collisionCount[i] += 1;
+              collisionCount[j] += 1;
+            end
+            else begin
+              //add i and j to new ignore collision array
+              SetLength(ignoreCollision, Length(ignoreCollision) + 1);
+              new := High(ignoreCollision);
+              ignoreCollision[new].i := i;
+              ignoreCollision[new].j := j;
+            end;
+          end;
+        end;
+      end;
       
+      cur := 0;
+      //while collision array
+      while (cur < Length(collision)) do begin
+        i := collision[cur].i;
+        j := collision[cur].j;
+        //precise check (i, j) - determine if asteroids actually collided - remove collision if precise check fails
+        if not PreciseCheck(asteroids[i], asteroids[j]) then begin
+          WriteLn('2.1.1');
+          //remove from collisions
+          Remove(collision, cur);
+          //set i and j collision count array to -1
+          collisionCount[i] -= 1;
+          collisionCount[j] -= 1;
+        end
+        else begin
+          cur += 1;
+        end;
+      end;
       
+      //loop collision count array
+      for cur := 0 to High(collisionCount) do begin
+        //if count > 1
+        if (collisionCount[cur] > 1) then begin
+          //remove any collisions with this asteroid from collision array
+          del := 0;
+          while (del < Length(collision)) do begin
+            if (collision[del].i = cur) or (collision[del].j = cur) then begin
+              Remove(collision, del);
+            end
+            else begin
+              del += 1;
+            end;
+          end;
+          //add to destroy array
+          SetLength(destroy, Length(destroy) + 1);
+          new := High(destroy);
+          destroy[new] := cur;
+        end;
+      end;
       
-      //while
-        //precise check, determine if asteroids actually collided
-          //if collided, leave in array
-          //if not collided, set i and j collision count array to +1
+      new := Length(ignoreCollision);
+      SetLength(ignoreCollision, Length(ignoreCollision) + Length(collision));
+      
+      for cur := 0 to High(collision) do begin
+        i := collision[cur].i;
+        j := collision[cur].j;
+        //perform collision
+        Collide(asteroids[i], asteroids[j]);
+        PlayCollisionEffect(state);
+        CreateSparks(debris,4,FindCollisionPoint(asteroids[i].pos,asteroids[i].rad,asteroids[j].pos,asteroids[j].rad));
+        //add to ignore collision array
+        ignoreCollision[new].i := i;
+        ignoreCollision[new].j := j;
+        new += 1;
+      end;
+
+      //loop destroy array
+      for cur := High(destroy) downto 0 do begin
+        //choose a random position around the center of the asteroid as the collision point
+        collisionPoint := asteroids[destroy[cur]].pos + VectorFromAngle(Rnd() * 360, 1);
+        //destroy the asteroid
+        PlayAsteroidExplodeEffect(state);
+        CreateSparks(debris,8,collisionPoint);
+        DestroyAsteroid(asteroids, destroy[cur], collisionPoint, debris);
         
+        //loop through ignore collision array
+        for del := 0 to High(ignoreCollision) do begin
+          //if any number in array is higher than the asteroid being destroyed, shift down by 1
+          if (ignoreCollision[del].j > destroy[cur]) then begin
+            ignoreCollision[del].j -= 1;
+            if (ignoreCollision[del].i > destroy[cur]) then begin
+              ignoreCollision[del].i -= 1;
+            end;
+          end;
+        end;
+      end;
+      
+      state.ignoreCollision := ignoreCollision;
+
+      ///                 ///
+      //ASTEROID COLLISIONS//
+      ///                 ///
       
       //asteroid collide asteroid
-    try
+
+{   try
       while i < Length(asteroids) - 1 do
       i := 0;
       begin
@@ -242,6 +356,7 @@ implementation
         WriteLn('j.last = ' + IntToStr(asteroids[j].last));
       end;
     end;
+}
 
       //asteroid collide player, asteroid collide enemy, asteroid collide bullet
       i := 0;

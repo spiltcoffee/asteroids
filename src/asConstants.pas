@@ -61,6 +61,7 @@ interface
     ASTEROID_MINDISTFROMPLAYER = 75;
     ASTEROID_MAXCREATION = 5; //how many times to try and create an asteroid per frame
     ASTEROID_SPEED_MULTIPLIER = 4;
+    ASTEROID_MINSCORE = 50;
 
     BULLET_SPEED = 8;
     BULLET_RADIUS = 2;

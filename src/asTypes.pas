@@ -38,6 +38,12 @@ interface
       Input
     );
 
+    TCollision = record
+      i: Integer;
+      j: Integer;
+    end;
+    TCollisionArray = array of TCollision;
+    
     TState = record
       playing: Boolean;
       paused: Boolean;
@@ -58,6 +64,7 @@ interface
       enemylives: Integer;
       enemynext: Integer; //points for next enemy
       pos: Point2D; //for drawing things
+      ignoreCollision: TCollisionArray;
     end;
 
     TMenuItem = record

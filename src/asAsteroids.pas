@@ -35,11 +35,10 @@ implementation
       offset := Rnd() / (maxpoints / 6);
       result.point[i].x := Trunc(amplitude * Cosine((i / Length(result.point)) * 360 + offset));
       result.point[i].y := Trunc(amplitude * Sine((i / Length(result.point)) * 360 + offset));
-      result.rad += amplitude;
+      result.rad := Max(result.rad, amplitude);
     end;
     
     result.vel := VectorFromAngle(Rnd(180),(Rnd() - 0.5) * ASTEROID_SPEED_MULTIPLIER);
-    result.rad := round(result.rad / maxpoints);
     
     result.rot.angle := 0;
     result.rot.speed := (Rnd() - 1 / 2) * 2 * ASTEROID_MAXROTATION;
@@ -96,7 +95,7 @@ implementation
     score: Integer;
   begin
     score := Trunc(sqr(ASTEROID_MAXSIZE - asteroids[del].rad) * PI);
-    score := (score - (score mod 100)) div 10;
+    score := Max((score - (score mod 100)) div 10, ASTEROID_MINSCORE);
     state.score += score;
     CreateScore(notes,score,asteroids[del]);
 

@@ -91,6 +91,13 @@ DoExitCompile ()
     exit 1;
 }
 
+DoExitLink ()
+{
+    echo "An error occurred while linking";
+    cat out.log
+    exit 1;
+}
+
 CleanTmp()
 {
     if [ -d "${TMP_DIR}" ]
@@ -140,7 +147,7 @@ doMacCompile()
 doLipo()
 {
     echo "  ... Creating Universal Binary"
-    lipo -arch ${1} "${TMP_DIR}/${1}/${GAME_NAME}" -arch ${2} "${TMP_DIR}/${2}/${GAME_NAME}" -output "${OUT_DIR}/${GAME_NAME}" -create
+    lipo -arch ${1} "${TMP_DIR}/${1}/${GAME_NAME}" -output "${OUT_DIR}/${GAME_NAME}" -create #-arch ${2} "${TMP_DIR}/${2}/${GAME_NAME}"
 }
 
 doMacPackage()
@@ -163,7 +170,7 @@ doMacPackage()
     echo "  ... Added Private Frameworks"
     cp -R -p "${LIB_DIR}/"*.framework "${GAMEAPP_PATH}/Contents/Frameworks/"
 
-    mv "${OUT_DIR}/${GAME_NAME}" "${GAMEAPP_PATH}/Contents/MacOS/"
+    cp -R -p "${OUT_DIR}/${GAME_NAME}" "${GAMEAPP_PATH}/Contents/MacOS/"
 
     echo "<?xml version='1.0' encoding='UTF-8'?>\
     <!DOCTYPE plist PUBLIC \"-//Apple Computer//DTD PLIST 1.0//EN\" \"http://www.apple.com/DTDs/PropertyList-1.0.dtd\">\
@@ -290,7 +297,7 @@ then
         #FPC_BIN="/usr/local/bin/ppcppc"
         #doMacCompile "ppc"
 
-        #doLipo "i386" "ppc"
+        doLipo "i386" "ppc"
         doMacPackage
     elif [ "$OS" = "$LIN" ]; then
         doLinuxCompile

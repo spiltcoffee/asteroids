@@ -17,7 +17,7 @@ fi
 
 # Move to src dir
 APP_PATH=`echo $0 | awk '{split($0,patharr,"/"); idx=1; while(patharr[idx+1] != "") { if (patharr[idx] != "/") {printf("%s/", patharr[idx]); idx++ }} }'`
-APP_PATH=`cd "$APP_PATH"; pwd` 
+APP_PATH=`cd "$APP_PATH"; pwd`
 cd "$APP_PATH"
 
 #Set the basic paths
@@ -40,7 +40,7 @@ CLEAN="N"
 Usage()
 {
     echo "Usage: [-c] [-h] [name]"
-    echo 
+    echo
     echo "Compiles your game into an executable application."
     echo "Output is located in $OUT_DIR."
     echo
@@ -85,10 +85,10 @@ fi
 
 
 DoExitCompile ()
-{ 
-    echo "An error occurred while compiling"; 
+{
+    echo "An error occurred while compiling";
     cat out.log
-    exit 1; 
+    exit 1;
 }
 
 CleanTmp()
@@ -108,16 +108,16 @@ doMacCompile()
 {
     mkdir -p ${TMP_DIR}/${1}
     echo "  ... Compiling $GAME_NAME - $1"
-    
+
     ${FPC_BIN}  $PAS_FLAGS ${SG_INC} -Mobjfpc -Sh -FE${TMP_DIR}/${1} -FU${TMP_DIR}/${1} -Fu${LIB_DIR} -Fi${SRC_DIR} -s ${SRC_DIR}/GameMain.pas > ${LOG_FILE}
     if [ $? != 0 ]; then DoExitCompile; fi
     rm -f ${LOG_FILE}
-    
+
     #Remove the pascal assembler script
     rm ${TMP_DIR}/${1}/ppas.sh
-    
+
     echo "  ... Assembling for $1"
-    
+
     #Assemble all of the .s files
     for file in `find ${TMP_DIR}/${1} | grep [.]s$`
     do
@@ -125,18 +125,18 @@ doMacCompile()
         if [ $? != 0 ]; then DoExitAsm $file; fi
         rm $file
     done
-    
+
     echo "  ... Linking ${GAME_NAME}"
-    
+
     FRAMEWORKS=`ls -d ${LIB_DIR}/*.framework | awk -F . '{split($1,patharr,"/"); idx=1; while(patharr[idx+1] != "") { idx++ } printf("-framework %s ", patharr[idx]) }'`
-    
+
     /usr/bin/ld /usr/lib/crt1.o -F${LIB_DIR} -L/usr/X11R6/lib -L/usr/lib -search_paths_first -multiply_defined suppress -o "${TMP_DIR}/${1}/${GAME_NAME}" `cat ${TMP_DIR}/${1}/link.res` -framework Cocoa ${FRAMEWORKS}
     if [ $? != 0 ]; then DoExitLink ${GAME_NAME}; fi
 }
 
-# 
+#
 # Create fat executable (i386 + ppc)
-# 
+#
 doLipo()
 {
     echo "  ... Creating Universal Binary"
@@ -146,14 +146,14 @@ doLipo()
 doMacPackage()
 {
     GAMEAPP_PATH="${OUT_DIR}/${GAME_NAME}.app"
-    if [ -d "${GAMEAPP_PATH}" ] 
+    if [ -d "${GAMEAPP_PATH}" ]
     then
     	echo "  ... Removing old application"
     	rm -rf "${GAMEAPP_PATH}"
     fi
 
     echo "  ... Creating Application Bundle"
-    
+
     mkdir "${GAMEAPP_PATH}"
     mkdir "${GAMEAPP_PATH}/Contents"
     mkdir "${GAMEAPP_PATH}/Contents/MacOS"
@@ -163,7 +163,7 @@ doMacPackage()
     echo "  ... Added Private Frameworks"
     cp -R -p "${LIB_DIR}/"*.framework "${GAMEAPP_PATH}/Contents/Frameworks/"
 
-    mv "${OUT_DIR}/${GAME_NAME}" "${GAMEAPP_PATH}/Contents/MacOS/" 
+    mv "${OUT_DIR}/${GAME_NAME}" "${GAMEAPP_PATH}/Contents/MacOS/"
 
     echo "<?xml version='1.0' encoding='UTF-8'?>\
     <!DOCTYPE plist PUBLIC \"-//Apple Computer//DTD PLIST 1.0//EN\" \"http://www.apple.com/DTDs/PropertyList-1.0.dtd\">\
@@ -201,7 +201,7 @@ doLinuxCompile()
 {
     mkdir -p ${TMP_DIR}
     echo "  ... Compiling $GAME_NAME"
-    
+
     ${FPC_BIN}  ${PAS_FLAGS} ${SG_INC} -Mobjfpc -Sh -FE${OUT_DIR} -FU${TMP_DIR} -Fu${LIB_DIR} -Fi${SRC_DIR} -o${GAME_NAME} ${SRC_DIR}/GameMain.pas > ${LOG_FILE}
     if [ $? != 0 ]; then DoExitCompile; fi
 }
@@ -214,9 +214,9 @@ doLinuxPackage()
 doWindowsCompile()
 {
     mkdir -p ${TMP_DIR}
-    
+
     echo "  ... Compiling $GAME_NAME"
-    
+
     LIB_DIR=`echo $LIB_DIR | sed 's/\/\(.\)\//\1:\//'`          #awk '{sub("/c/", "c:/"); print}'`
     TMP_DIR=`echo $TMP_DIR | sed 's/\/\(.\)\//\1:\//'`          #awk '{sub("/c/", "c:/"); print}'`
     SRC_DIR=`echo $SRC_DIR | sed 's/\/\(.\)\//\1:\//'`          #awk '{sub("/c/", "c:/"); print}'`
@@ -228,16 +228,16 @@ doWindowsCompile()
     echo "  ... Creating Resources"
     windres ${SRC_DIR}/SwinGame.rc ${SRC_DIR}/GameLauncher.res
     if [ $? != 0 ]; then DoExitCompile; fi
-    
+
     ${FPC_BIN}  ${PAS_FLAGS} ${SG_INC} -Mobjfpc -Sh -FE${OUT_DIR} -FU${TMP_DIR} -Fu${LIB_DIR} -Fi${SRC_DIR} -o${GAME_NAME}.exe ${SRC_DIR}/GameMain.pas > ${LOG_FILE}
     if [ $? != 0 ]; then DoExitCompile; fi
-    
+
 }
 
 doWindowsPackage()
 {
     RESOURCE_DIR=${OUT_DIR}/Resources
-    
+
     echo "  ... Copying libraries"
     cp -p -f "${LIB_DIR}"/*.dll "${OUT_DIR}"
 }
@@ -247,9 +247,9 @@ copyWithoutSVN()
 {
     FROM_DIR=$1
     TO_DIR=$2
-    
+
     cd "${FROM_DIR}"
-    
+
     # Create directory structure
     find . -mindepth 1 ! -path \*.svn\* ! -path \*/. -type d -exec mkdir -p "${TO_DIR}/{}" \;
     # Copy files and links
@@ -262,7 +262,7 @@ copyWithoutSVN()
 doCopyResources()
 {
     echo "  ... Copying Resources into $GAME_NAME"
-    
+
     copyWithoutSVN "${APP_PATH}/Resources" "${RESOURCE_DIR}"
 }
 
@@ -273,7 +273,7 @@ then
     then
         mkdir -p "${OUT_DIR}"
     fi
-    
+
     echo "--------------------------------------------------"
     echo "          Creating $GAME_NAME"
     echo "          for $OS"
@@ -283,14 +283,14 @@ then
     echo "  Compiler flags ${SG_INC} ${C_FLAGS}"
     echo "--------------------------------------------------"
     echo "  ... Creating ${GAME_NAME}"
-    
+
     if [ "$OS" = "$MAC" ]; then
-        FPC_BIN=`which ppc386`
+        FPC_BIN="/usr/local/bin/ppc386" #old: `which ppc386`
         doMacCompile "i386"
-        FPC_BIN=`which ppcppc`
-        doMacCompile "ppc"
-        
-        doLipo "i386" "ppc"
+        #FPC_BIN="/usr/local/bin/ppcppc"
+        #doMacCompile "ppc"
+
+        #doLipo "i386" "ppc"
         doMacPackage
     elif [ "$OS" = "$LIN" ]; then
         doLinuxCompile
@@ -299,7 +299,7 @@ then
         doWindowsCompile
         doWindowsPackage
     fi
-    
+
     doCopyResources
 else
     CleanTmp

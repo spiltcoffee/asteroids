@@ -8,7 +8,7 @@
 // Change History:
 //
 // Version 3:
-// - 2010-01-28: David  : Changed MapAnimationTemplate to use an already loaded 
+// - 2010-01-28: David  : Changed MapAnimationTemplate to use an already loaded
 //												bitmap if found
 // - 2009-12-21: Andrew : Changed to include sound filename in animation loading.
 // - 2009-12-18: Andrew : Added in code to verify animations have no loops
@@ -35,11 +35,11 @@ unit sgAnimations;
 interface
   uses sgTypes;
 //=============================================================================
-  
+
   //----------------------------------------------------------------------------
   // Creating an AnimationTemplate
   //----------------------------------------------------------------------------
-  
+
   /// Load animation details from a animation frames file.
   ///
   /// @lib
@@ -49,8 +49,8 @@ interface
   /// @constructor
   /// @csn initFromFile:%s
   function LoadAnimationTemplate(filename: String) : AnimationTemplate;
-  
-  /// Frees loaded animation frames data. Use this when you will no longer be 
+
+  /// Frees loaded animation frames data. Use this when you will no longer be
   /// using the animation for any purpose, including within sprites.
   ///
   /// @lib
@@ -58,12 +58,12 @@ interface
   /// @class AnimationTemplate
   /// @dispose
   procedure FreeAnimationTemplate(var framesToFree: AnimationTemplate);
-  
-  
+
+
   //----------------------------------------------------------------------------
   // AnimationTemplate mapping routines
   //----------------------------------------------------------------------------
-  
+
   /// The index of the animation within the animation template that has the supplied name.
   ///
   /// @lib
@@ -73,7 +73,7 @@ interface
   /// @method IndexOfAnimation
   /// @csn indexOfAnimation:%s
   function AnimationIndex(temp: AnimationTemplate; name: String): LongInt;
-  
+
   /// The name of the animation within the animation template at the specified index.
   ///
   /// @lib
@@ -83,16 +83,16 @@ interface
   /// @method NameOfAnimation
   /// @csn nameOfAnimation:%s
   function AnimationName(temp: AnimationTemplate; idx: LongInt): String;
-  
-  
+
+
   //----------------------------------------------------------------------------
   // AnimationTemplate mapping routines
   //----------------------------------------------------------------------------
-  
+
   /// Loads and returns a AnimationTemplate. The supplied `filename` is used to
-  /// locate the AnimationTemplate to load. The supplied `name` indicates the 
+  /// locate the AnimationTemplate to load. The supplied `name` indicates the
   /// name to use to refer to this in SwinGame. The `AnimationTemplate` can then be
-  /// retrieved by passing this `name` to the `FetchAnimationTemplate` function. 
+  /// retrieved by passing this `name` to the `FetchAnimationTemplate` function.
   ///
   /// @lib
   /// @sn animationTemplateNamed:%s fromFile:%s
@@ -101,36 +101,36 @@ interface
   /// @constructor
   /// @csn initWithName:%s forFile:%s
   function MapAnimationTemplate(name, filename: String): AnimationTemplate;
-  
+
   /// Determines if SwinGame has animation frames loaded for the supplied name.
   /// This checks against all loaded animation frames, those loaded without a name
   /// are assigned the filename as a default.
   ///
   /// @lib
   function HasAnimationTemplate(name: String): Boolean;
-  
+
   /// Returns the `AnimationTemplate` that has been loaded with the specified name,
   /// see `MapAnimationTemplate`.
   ///
   /// @lib
   function AnimationTemplateNamed(name: String): AnimationTemplate;
-  
+
   /// Releases the SwinGame resources associated with the animation template of the
   /// specified `name`.
   ///
   /// @lib
   procedure ReleaseAnimationTemplate(name: String);
-  
+
   /// Releases all of the animation templates that have been loaded.
   ///
   /// @lib
   procedure ReleaseAllAnimationTemplates();
-  
-  
+
+
   //----------------------------------------------------------------------------
   // Creating an Animation
   //----------------------------------------------------------------------------
-  
+
   /// Creates an animation from a AnimationTemplate. This may play a sound effect
   /// if the animation is set to play a sound effect on its first frame.
   ///
@@ -141,7 +141,7 @@ interface
   /// @constructor
   /// @csn initAsName:%s from:%s
   function CreateAnimation(identifier: String;  frames: AnimationTemplate): Animation; overload;
-  
+
   /// Creates an animation from a AnimationTemplate. If withSound is true, this may
   /// play a sound effect if the animation is set to play a sound effect on its first frame.
   ///
@@ -151,8 +151,8 @@ interface
   /// @class Animation
   /// @constructor
   /// @csn initAsName:%s from:%s withSound:%s
-  function CreateAnimation(identifier: String;  frames: AnimationTemplate; withSound: Boolean): Animation;
-  
+  function CreateAnimation(identifier: String;  frames: AnimationTemplate; withSound: Boolean): Animation; overload;
+
   /// Creates an animation from a AnimationTemplate. If withSound is true, this may
   /// play a sound effect if the animation is set to play a sound effect on its first frame.
   ///
@@ -163,7 +163,7 @@ interface
   /// @constructor
   /// @csn initAtIndex:%s from:%s withSound:%s
   function CreateAnimation(identifier: LongInt;  frames: AnimationTemplate; withSound: Boolean): Animation; overload;
-  
+
   /// Creates an animation from a AnimationTemplate. This may play a sound effect
   /// if the animation is set to play a sound effect on its first frame.
   ///
@@ -174,7 +174,7 @@ interface
   /// @constructor
   /// @csn initAtIndex:%s from:%s
   function CreateAnimation(identifier: LongInt;  frames: AnimationTemplate): Animation; overload;
-  
+
   /// Disposes of the resources used in the animation.
   ///
   /// @lib
@@ -182,12 +182,12 @@ interface
   /// @class Animation
   /// @dispose
   procedure FreeAnimation(var ani: Animation);
-  
-  
+
+
   //----------------------------------------------------------------------------
   // Drawing Animations
   //----------------------------------------------------------------------------
-  
+
   /// Assign a new starting animation to the passed in animation from the AnimationTemplate.
   /// This may play a sound if the first frame of the animation is linked to a sound effect.
   ///
@@ -198,7 +198,7 @@ interface
   /// @overload AssignAnimation AssignAnimationNamed
   /// @csn assignAnimationNamed:%s from:%s
   procedure AssignAnimation(anim: Animation; name: String; frames: AnimationTemplate); overload;
-  
+
   /// Assign a new starting animation to the passed in animation from the AnimationTemplate.
   /// This may play a sound if the first frame of the animation is linked to a sound effect, and withSound is true.
   ///
@@ -209,7 +209,7 @@ interface
   /// @overload AssignAnimation AssignAnimationNamedWithSound
   /// @csn assignAnimationNamed:%s from:%s withSound:%s
   procedure AssignAnimation(anim: Animation; name: String; frames: AnimationTemplate; withSound: Boolean); overload;
-  
+
   /// Assign a new starting animation to the passed in animation from the AnimationTemplate.
   /// This may play a sound if the first frame of the animation is linked to a sound effect.
   ///
@@ -220,7 +220,7 @@ interface
   /// @method AssignAnimation
   /// @csn assignAnimation:%s from:%s
   procedure AssignAnimation(anim: Animation; idx: LongInt; frames: AnimationTemplate); overload;
-  
+
   /// Assign a new starting animation to the passed in animation from the AnimationTemplate.
   /// This may play a sound if the first frame of the animation is linked to a sound effect, and withSound is true.
   ///
@@ -231,11 +231,11 @@ interface
   /// @overload AssignAnimation AssignAnimationWithSound
   /// @csn assignAnimation:%s from:%s withSound:%s
   procedure AssignAnimation(anim: Animation; idx: LongInt; frames: AnimationTemplate; withSound: Boolean); overload;
-  
+
   //----------------------------------------------------------------------------
   // Drawing Animations
   //----------------------------------------------------------------------------
-  
+
   /// Uses the animation information to draw a bitmap at the specified
   /// x,y location.
   ///
@@ -246,7 +246,7 @@ interface
   /// @method DrawBitmap
   /// @csn drawBitmap:%s x:%s y:%s
   procedure DrawAnimation(ani: Animation; bmp: Bitmap; x,y: LongInt); overload;
-  
+
   /// Uses the animation information to draw a bitmap at the specified
   /// point.
   ///
@@ -257,7 +257,7 @@ interface
   /// @overload DrawBitmap DrawBitmapAtPt
   /// @csn drawBitmap:%s pt:%s
   procedure DrawAnimation(ani: Animation; bmp: Bitmap; const pt: Point2D); overload;
-  
+
   /// Uses the animation information to draw a bitmap at the specified
   /// x,y location on a destination bitmap.
   ///
@@ -269,7 +269,7 @@ interface
   /// @self 2
   /// @csn drawOnto:%s bitmap:%s x:%s y:%s
   procedure DrawAnimation(dest: Bitmap; ani: Animation; bmp: Bitmap; x,y: LongInt); overload;
-  
+
   /// Uses the animation information to draw a bitmap at the specified
   /// point on a destination bitmap.
   ///
@@ -280,7 +280,7 @@ interface
   /// @overload DrawBitmap DrawBitmapAtPtOnto
   /// @csn drawOnto:%s using:%s pt:%s
   procedure DrawAnimation(dest: Bitmap; ani: Animation; bmp: Bitmap; const pt: Point2D); overload;
-  
+
   /// Uses the animation information to draw a bitmap to the screen at the specified
   /// x,y location.
   ///
@@ -291,7 +291,7 @@ interface
   /// @method DrawBitmapOnScreen
   /// @csn drawBitmap:%s onScreenAtX:%s y:%s
   procedure DrawAnimationOnScreen(ani: Animation; bmp: Bitmap; x,y: LongInt); overload;
-  
+
   /// Uses the animation information to draw a bitmap to the screen at the specified
   /// point.
   ///
@@ -302,16 +302,16 @@ interface
   /// @overload DrawBitmapOnScreen DrawBitmapAtPtOnScreen
   /// @csn drawBitmap:%s onScreenAtPt:%s
   procedure DrawAnimationOnScreen(ani: Animation; bmp: Bitmap; const pt: Point2D); overload;
-  
-  
+
+
   //----------------------------------------------------------------------------
   // Updating Animations
   //----------------------------------------------------------------------------
-  
+
   /// Updates the animation, updating the time spent and possibly moving to a new
   /// frame in the animation. This may play a sound effect if the new frame
   /// triggers a sound.
-  /// 
+  ///
   /// @lib
   /// @sn updateAnimation:%s
   ///
@@ -319,11 +319,11 @@ interface
   /// @method Update
   /// @csn update
   procedure UpdateAnimation(anim: Animation); overload;
-  
+
   /// Updates the animation a certain percentage and possibly moving to a new
   /// frame in the animation. This may play a sound effect if the new frame
   /// triggers a sound.
-  /// 
+  ///
   /// @lib UpdateAnimationPct
   /// @sn updateAnimation:%s pct:%s
   ///
@@ -331,51 +331,51 @@ interface
   /// @overload Update UpdatePct
   /// @csn updatePct:%s
   procedure UpdateAnimation(anim: Animation; pct: Single); overload;
-  
+
   /// Updates the animation a certain percentage and possibly moving to a new
   /// frame in the animation. This may play a sound effect if the new frame
   /// triggers a sound and withSound is true.
-  /// 
+  ///
   /// @lib UpdateAnimationPctAndSound
   /// @sn updateAnimation:%s pct:%s withSound:%s
-  /// 
+  ///
   /// @class Animation
   /// @overload Update UpdatePctAndSound
   /// @csn updatePct:%s withSound:%s
   procedure UpdateAnimation(anim: Animation; pct: Single; withSound: Boolean); overload;
-  
+
   /// Restarts the animation. This may play a sound effect if the first frame
   /// triggers a sound.
-  /// 
+  ///
   /// @lib ResetAnimation
-  /// 
+  ///
   /// @class Animation
   /// @method Reset
   procedure RestartAnimation(anim: Animation); overload;
-  
+
   /// Restarts the animation. This may play a sound effect if the first frame
   /// triggers a sound and withSound is true.
-  /// 
+  ///
   /// @lib ResetAnimationWithSound
   /// @sn resetAnimation:%s withSound:%s
-  /// 
+  ///
   /// @class Animation
   /// @overload Reset ResetWithSound
   /// @csn resetWithSound:%s
   procedure RestartAnimation(anim: Animation; withSound: Boolean); overload;
-  
+
   //----------------------------------------------------------------------------
   // Query Animation
   //----------------------------------------------------------------------------
-  
+
   /// Indicates if an animation has ended. Animations with loops will never end.
-  /// 
+  ///
   /// @lib
   ///
   /// @class Animation
   /// @getter Ended
   function AnimationEnded(anim: Animation): Boolean;
-  
+
   /// Returns the current cell (the part of the image or sprite) of this animation.
   /// This can be used to animate an image or sprite.
   ///
@@ -384,30 +384,30 @@ interface
   /// @class Animation
   /// @getter CurrentCell
   function AnimationCurrentCell(anim: Animation): LongInt;
-  
+
   /// Returns true if the animation entered a new frame on its last update.
   /// This can be used to trigger actions on frames within an animation.
   ///
   /// @lib
-  /// 
+  ///
   /// @class Animation
   /// @getter EnteredFrame
   function AnimationEnteredFrame(anim: Animation): Boolean;
-  
+
   /// Returns the amount of time spent in the current frame. When this exceeds
   /// the frame's duration the animation moves to the next frame.
-  /// 
+  ///
   /// @lib
-  /// 
+  ///
   /// @class Animation
   /// @getter FrameTime
   function AnimationFrameTime(anim: Animation): Single;
-  
-  
+
+
 //=============================================================================
 implementation
   uses
-    SysUtils, StrUtils, Classes, 
+    SysUtils, StrUtils, Classes,
     stringhash, sgUtils, sgNamedIndexCollection,   // libsrc
     SDL_Mixer, SDL,           // SDL
     sgShared, sgResources, sgTrace, sgAudio, sgImages;
@@ -432,7 +432,7 @@ var
   input: Text; //the bundle file
   line, id, data, path: String;
   lineNo, maxId: LongInt;
-  
+
   procedure AddRow(myRow: RowData);
   var
     j: LongInt;
@@ -441,7 +441,7 @@ var
     if myRow.id > maxId then
     begin
       SetLength(rows, myRow.id + 1);
-      
+
       // Mark new rows as "empty"
       for j := maxId + 1 to High(rows) do
       begin
@@ -450,10 +450,10 @@ var
         rows[j].cell := -1;
         rows[j].next := -1;
       end;
-      
+
       maxId := myRow.id;
     end;
-    
+
     if rows[myRow.id].id <> -1 then
     begin
       RaiseException('Error at line ' + IntToStr(lineNo) + ' in animation ' + filename + '. A frame with id ' + IntToStr(myRow.id) + ' already exists.');
@@ -479,11 +479,11 @@ var
         exit;
       end;
     end;
-    
+
     SetLength(ids, Length(ids) + 1);
     ids[High(ids)] := myId;
   end;
-  
+
   procedure ProcessFrame();
   var
     myRow: RowData;
@@ -498,10 +498,10 @@ var
     myRow.dur   := MyStrToInt(ExtractDelimited(3,data,[',']), false);
     myRow.next  := MyStrToInt(ExtractDelimited(4,data,[',']), true);
     myRow.snd   := nil;
-    
+
     AddRow(myRow);
   end;
-  
+
   procedure ProcessMultiFrame();
   var
     id_range, cell_range: Array of LongInt;
@@ -513,19 +513,19 @@ var
       RaiseException('Error at line ' + IntToStr(lineNo) + ' in animation ' + filename + '. A multi-frame must have 4 values separated as id-range,cell-range,dur,next');
       exit;
     end;
-    
+
     id_range := ProcessRange(ExtractDelimitedWithRanges(1, data));
     cell_range := ProcessRange(ExtractDelimitedWithRanges(2, data));
-    
+
     if Length(id_range) <> Length(cell_range) then
     begin
       RaiseException('Error at line ' + IntToStr(lineNo) + ' in animation ' + filename + '. The range of cells and ids is not the same length.');
       exit;
     end;
-    
+
     dur := MyStrToInt(ExtractDelimitedWithRanges(3,data), false);
     next := MyStrToInt(ExtractDelimitedWithRanges(4,data), true);
-    
+
     for j := Low(id_range) to High(id_range) do
     begin
       myRow.id    := id_range[j];
@@ -539,7 +539,7 @@ var
       AddRow(myRow);
     end;
   end;
-  
+
   procedure ProcessId();
   var
     myIdData: IdData;
@@ -549,13 +549,13 @@ var
       RaiseException('Error at line ' + IntToStr(lineNo) + ' in animation ' + filename + '. A id must have 2 values separated as name,start-id');
       exit;
     end;
-    
+
     myIdData.name := ExtractDelimited(1,data,[',']);
     myIdData.startId := MyStrToInt(ExtractDelimited(2,data,[',']), false);
-    
+
     AddID(myIdData);
   end;
-  
+
   procedure ProcessSound();
   var
     id: LongInt;
@@ -568,10 +568,10 @@ var
     end;
 
     id := MyStrToInt(ExtractDelimited(1,data,[',']), true);
-    
+
     sndId := ExtractDelimited(2,data,[',']);
     sndFile := ExtractDelimited(3,data,[',']);
-    
+
     if not HasSoundEffect(sndId) then
     begin
       if MapSoundEffect(sndId, sndFile) = nil then
@@ -582,20 +582,20 @@ var
     end;
     rows[id].snd := SoundEffectNamed(sndId);
   end;
-  
+
   procedure ProcessLine();
   begin
     // Split line into id and data
     id := ExtractDelimited(1, line, [':']);
     data := ExtractDelimited(2, line, [':']);
-    
+
     // Verify that id is a single char
     if Length(id) <> 1 then
     begin
       RaiseException('Error at line ' + IntToStr(lineNo) + ' in animation ' + filename + '. Error with id: ' + id + '. This should be a single character.');
       exit;
     end;
-    
+
     // Process based on id
     case LowerCase(id)[1] of // in all cases the data variable is read
       'f': ProcessFrame();
@@ -609,20 +609,20 @@ var
       end;
     end;
   end;
-  
+
   procedure BuildFrameLists();
   var
     frames: Array of AnimationFrame;
     j, nextIdx, addedIdx: LongInt;
   begin
     SetLength(frames, Length(rows));
-    
+
     for j := 0 to High(frames) do
     begin
       // Allocte space for frames
       New(frames[j]);
     end;
-    
+
     // Link the frames together
     for j := 0 to High(frames) do
     begin
@@ -630,10 +630,10 @@ var
       frames[j]^.cellIndex  := rows[j].cell;
       frames[j]^.sound      := rows[j].snd;
       frames[j]^.duration   := rows[j].dur;
-      
-      // Get the next id and then 
+
+      // Get the next id and then
       nextIdx := rows[j].next;
-      
+
       if nextIdx = -1 then
       begin
         //The end of a list of frames = no next
@@ -647,20 +647,20 @@ var
       end
       else
         frames[j]^.next := frames[nextIdx];
-        
+
       //WriteLn(j, ' = ', frames[j]^.cellIndex, ' -> ', nextIdx);
     end;
-    
+
     //We have the data ready, now lets create the linked lists...
     New(result);
-    
+
     result^.name      := name;      // name taken from parameter of DoLoadAnimationTemplate
     result^.filename  := filename;  // filename also taken from parameter
     result^.frames    := frames;    // The frames of this animation.
-    
+
     SetLength(result^.animations, Length(ids));
     InitNamedIndexCollection(result^.animationIds);   //Setup the name <-> id mappings
-    
+
     for j := 0 to High(ids) do                        //Add in the animation starting indexes
     begin
       addedIdx := AddName(result^.animationIds, ids[j].name);   //Allocate the index
@@ -668,7 +668,7 @@ var
       //WriteLn('load ids: ', addedIdx, ' - startid ', ids[j].startId)
     end;
   end;
-  
+
   procedure MakeFalse(var visited: Array of Boolean);
   var
     i: LongInt;
@@ -678,21 +678,21 @@ var
       visited[i] := false;
     end;
   end;
-  
+
   function SumLoop(start: AnimationFrame): Single;
   var
     current: AnimationFrame;
   begin
     result := start^.duration;
     current := start^.next;
-    
+
     while (current <> start) and (assigned(current)) do
     begin
       result := result + current^.duration;
       current := current^.next;
     end;
   end;
-  
+
   // Animations with loops must have a duration > 0 for at least one frame
   procedure CheckAnimationLoops();
   var
@@ -702,7 +702,7 @@ var
     current: AnimationFrame;
   begin
     done := true;
-    
+
     // check for all positive
     for i := 0 to High(result^.frames) do
     begin
@@ -712,18 +712,18 @@ var
         break;
       end;
     end;
-    
+
     if done then exit;
-    
+
     SetLength(visited, Length(result^.frames));
-    
+
     // Check through each animation for a loop
     for i := 0 to High(result^.animations) do
     begin
       MakeFalse(visited);
-      
+
       current := result^.frames[result^.animations[i]];
-      
+
       // Check for a loop
       while current <> nil do
       begin
@@ -742,52 +742,52 @@ var
       end;
     end;
   end;
-  
+
   procedure VerifyVersion();
   begin
     if EOF(input) then exit;
     line := '';
-    
+
     while (Length(line) = 0) or (MidStr(line,1,2) = '//') do
     begin
       ReadLn(input, line);
       line := Trim(line);
     end;
-    
+
     //Verify that the line has the right version
-    if line <> 'SwinGame Animation #v1' then 
+    if line <> 'SwinGame Animation #v1' then
       RaiseException('Error in animation ' + filename + '. Animation files must start with "SwinGame Animation #v1"');
-    
+
   end;
 begin
   {$IFDEF TRACE}
     TraceEnter('sgAnimations', 'LoadAnimationTemplate');
   {$ENDIF}
-  
+
   path := FilenameToResource(name, AnimationResource);
   lineNo := 0;
   maxId := -1;
   SetLength(rows, 0);
   result := nil;
-  
+
   Assign(input, path);
   Reset(input);
-  
+
   VerifyVersion();
-  
+
   try
     while not EOF(input) do
     begin
       lineNo := lineNo + 1;
-    
+
       ReadLn(input, line);
       line := Trim(line);
       if Length(line) = 0 then continue;  //skip empty lines
       if MidStr(line,1,2) = '//' then continue; //skip lines starting with //
-    
+
       ProcessLine();
     end;
-  
+
     BuildFrameLists();
     CheckAnimationLoops();
   finally
@@ -795,7 +795,7 @@ begin
   end;
   {$IFDEF TRACE}
     TraceExit('sgAnimations', 'LoadAnimationTemplate');
-  {$ENDIF}  
+  {$ENDIF}
 end;
 
 function LoadAnimationTemplate(filename: String) : AnimationTemplate;
@@ -818,16 +818,16 @@ begin
   {$IFDEF TRACE}
     TraceEnter('sgAnimations', 'MapAnimationFrame', name + ' = ' + filename);
   {$ENDIF}
-  
+
   if _Animations.containsKey(name) then
   begin
     result := AnimationTemplateNamed(name);
     exit;
   end;
-  
+
   frm := DoLoadAnimationTemplate(filename, name);
   obj := tResourceContainer.Create(frm);
-  
+
   if not _Animations.setValue(name, obj) then
   begin
     RaiseException('** Leaking: Caused by loading AnimationTemplate resource twice, ' + name);
@@ -835,7 +835,7 @@ begin
     exit;
   end;
   result := frm;
-  
+
   {$IFDEF TRACE}
     TraceExit('sgAnimations', 'MapAnimationFrame', HexStr(result));
   {$ENDIF}
@@ -846,9 +846,9 @@ begin
   {$IFDEF TRACE}
     TraceEnter('sgAnimations', 'HasAnimationTemplate', name);
   {$ENDIF}
-  
+
   result := _Animations.containsKey(name);
-  
+
   {$IFDEF TRACE}
     TraceExit('sgAnimations', 'HasAnimationTemplate', BoolToStr(result, true));
   {$ENDIF}
@@ -861,11 +861,11 @@ begin
   {$IFDEF TRACE}
     TraceEnter('sgAnimations', 'AnimationTemplateNamed', name);
   {$ENDIF}
-  
+
   tmp := _Animations.values[name];
   if assigned(tmp) then result := AnimationTemplate(tResourceContainer(tmp).Resource)
   else result := nil;
-  
+
   {$IFDEF TRACE}
     TraceExit('sgAnimations', 'AnimationTemplateNamed', HexStr(result));
   {$ENDIF}
@@ -876,7 +876,7 @@ var
   i: LongInt;
 begin
   FreeNamedIndexCollection(frm^.animationIds);
-  
+
   for i := 0 to High(frm^.frames) do
   begin
     Dispose(frm^.frames[i]);
@@ -893,15 +893,15 @@ begin
   {$IFDEF TRACE}
     TraceEnter('sgAnimations', 'ReleaseAnimationTemplate', 'frm = ' + name);
   {$ENDIF}
-  
+
   frm := AnimationTemplateNamed(name);
-  
+
   if (assigned(frm)) then
   begin
     _Animations.remove(name).Free();
     DoFreeAnimationTemplate(frm);
   end;
-  
+
   {$IFDEF TRACE}
     TraceExit('sgAnimations', 'ReleaseAnimationTemplate');
   {$ENDIF}
@@ -912,9 +912,9 @@ begin
   {$IFDEF TRACE}
     TraceEnter('sgAnimations', 'ReleaseAllAnimationTemplates', '');
   {$ENDIF}
-  
+
   ReleaseAll(_Animations, @ReleaseAnimationTemplate);
-  
+
   {$IFDEF TRACE}
     TraceExit('sgAnimations', 'ReleaseAllAnimationTemplates');
   {$ENDIF}
@@ -925,9 +925,9 @@ begin
   result := nil;
   if temp = nil then exit;
   if (id < 0) or (id > High(temp^.animations)) then exit;
-  
+
   result := temp^.frames[id];
-  
+
 end;
 
 //----------------------------------------------------------------------------
@@ -953,7 +953,7 @@ function CreateAnimation(identifier: LongInt;  frames: AnimationTemplate; withSo
 begin
   result := nil;
   if frames = nil then exit;
-  
+
   new(result);
   AssignAnimation(result, identifier, frames, withSound)
 end;
@@ -966,7 +966,7 @@ end;
 function CreateAnimation(identifier: String;  frames: AnimationTemplate; withSound: Boolean): Animation; overload;
 begin
   if frames = nil then exit;
-    
+
   result := CreateAnimation(IndexOf(frames^.animationIds, identifier), frames, withSound);
 end;
 
@@ -993,12 +993,12 @@ end;
 procedure AssignAnimation(anim: Animation; idx: LongInt; frames: AnimationTemplate; withSound: Boolean); overload;
 begin
   if (not assigned(anim)) or (not assigned(frames)) then exit;
-  if (idx < 0) or (idx > High(frames^.animations)) then 
-  begin 
-    //RaiseException('Assigning an animation frame that is not within range 0-' + IntToStr(High(frames^.animations)) + '.'); 
-    exit; 
+  if (idx < 0) or (idx > High(frames^.animations)) then
+  begin
+    //RaiseException('Assigning an animation frame that is not within range 0-' + IntToStr(High(frames^.animations)) + '.');
+    exit;
   end;
-  
+
   anim^.firstFrame    := frames^.frames[frames^.animations[idx]];
   RestartAnimation(anim, withSound);
 end;
@@ -1009,24 +1009,24 @@ begin
     TraceEnter('sgAnimations', 'UpdateAnimation', '');
     try
   {$ENDIF}
-  
+
   if AnimationEnded(anim) then exit;
-    
+
   anim^.frameTime     := anim^.frameTime + pct;
   anim^.enteredFrame  := false;
-  
+
   if anim^.frameTime >= anim^.currentFrame^.duration then
   begin
     anim^.frameTime := anim^.frameTime - anim^.currentFrame^.duration; //reduce the time
     anim^.lastFrame := anim^.currentFrame; //store last frame
     anim^.currentFrame := anim^.currentFrame^.next; //get the next frame
-    
+
     if assigned(anim^.currentFrame) and assigned(anim^.currentFrame^.sound) and withSound then
     begin
       PlaySoundEffect(anim^.currentFrame^.sound);
     end;
   end;
-  
+
   {$IFDEF TRACE}
     finally
       TraceExit('sgAnimations', 'UpdateAnimation', '');
@@ -1048,7 +1048,7 @@ function AnimationEnded(anim: Animation): Boolean;
 begin
   if not Assigned(anim) then
     result := true
-  else 
+  else
     result := not Assigned(anim^.currentFrame);
 end;
 
@@ -1060,12 +1060,12 @@ end;
 procedure RestartAnimation(anim: Animation; withSound: Boolean); overload;
 begin
   if not assigned(anim) then exit;
-  
+
   anim^.currentFrame  := anim^.firstFrame;
   anim^.lastFrame     := anim^.firstFrame;
   anim^.frameTime     := 0;
   anim^.enteredFrame  := true;
-  
+
   if assigned(anim^.currentFrame) and assigned(anim^.currentFrame^.sound) and withSound then
     PlaySoundEffect(anim^.currentFrame^.sound);
 end;
@@ -1087,7 +1087,7 @@ function AnimationEnteredFrame(anim: Animation): Boolean;
 begin
   if not Assigned(anim) then
     result := false
-  else 
+  else
     result := anim^.enteredFrame;
 end;
 
@@ -1095,7 +1095,7 @@ function AnimationFrameTime(anim: Animation): Single;
 begin
   if not Assigned(anim) then
     result := -1
-  else 
+  else
     result := anim^.frameTime;
 end;
 
@@ -1105,9 +1105,9 @@ begin
   {$IFDEF TRACE}
     TraceEnter('sgAnimations', 'DrawAnimation', ''); try
   {$ENDIF}
-  
+
   DrawCell(bmp, AnimationCurrentCell(ani), x, y);
-  
+
   {$IFDEF TRACE}
     finally TraceExit('sgAnimations', 'DrawAnimation', ''); end;
   {$ENDIF}
@@ -1157,9 +1157,9 @@ begin
   {$IFDEF TRACE}
     TraceEnter('sgAnimations', 'DrawAnimationOnScreen', ''); try
   {$ENDIF}
-  
+
   DrawCellOnScreen(bmp, AnimationCurrentCell(ani), x, y);
-  
+
   {$IFDEF TRACE}
     finally TraceExit('sgAnimations', 'DrawAnimation', ''); end;
   {$ENDIF}
@@ -1170,9 +1170,9 @@ begin
   {$IFDEF TRACE}
     TraceEnter('sgAnimations', 'DrawAnimationOnScreen', ''); try
   {$ENDIF}
-  
+
   DrawCellOnScreen(bmp, AnimationCurrentCell(ani), pt);
-  
+
   {$IFDEF TRACE}
     finally TraceExit('sgAnimations', 'DrawAnimation', ''); end;
   {$ENDIF}
@@ -1197,11 +1197,11 @@ end;
     {$IFDEF TRACE}
       TraceEnter('sgAnimations', 'Initialise', '');
     {$ENDIF}
-    
+
     InitialiseSwinGame();
-    
+
     _Animations := TStringHash.Create(False, 1024);
-    
+
     {$IFDEF TRACE}
       TraceExit('sgAnimations', 'Initialise');
     {$ENDIF}

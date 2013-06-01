@@ -69,7 +69,7 @@
 {$IFDEF UNIX}
   {$IFNDEF DARWIN}
     {$linklib gcc}
-  {$ENDIF}  
+  {$ENDIF}
 {$ENDIF}
 
 /// SwinGame's Core is responsible for core functionality such as creating
@@ -85,43 +85,43 @@ unit sgCore;
 interface
   uses sgTypes, SDL;
 //=============================================================================
-  
-  
+
+
   //----------------------------------------------------------------------------
   // Library Version
   //----------------------------------------------------------------------------
-  
+
   /// Retrieves a string representing the version of SwinGame that is executing.
   /// This can be used to check that the version supports the features required
   /// for your game.
   ///
   /// @lib
   function SwinGameVersion(): String;
-  
-  
-  
+
+
+
   //----------------------------------------------------------------------------
   // Exception Notification/Message
   //----------------------------------------------------------------------------
-  
-  /// This function can be used to retrieve a message containing the details of 
+
+  /// This function can be used to retrieve a message containing the details of
   /// the last error that occurred in SwinGame.
   ///
   /// @lib
   function ExceptionMessage(): String;
-  
+
   /// This function tells you if an error occurred with the last operation in
   /// SwinGame.
   ///
   /// @lib
   function ExceptionOccured(): Boolean;
-  
-  
-  
+
+
+
   //----------------------------------------------------------------------------
   // Icon / Window Open / Screen Size / Resize
   //----------------------------------------------------------------------------
-  
+
   /// Sets the icon for the window. This must be called before openning the
   /// graphics window. The icon is loaded as a bitmap, though this can be from
   /// any kind of bitmap file.
@@ -134,7 +134,7 @@ interface
   ///
   /// @lib
   procedure SetIcon(filename: String);
-  
+
   /// Opens the graphical window so that it can be drawn onto. You can set the
   /// icon for this window using SetIcon. The window itself is only drawn when
   /// you call RefreshScreen. All windows are opened at 32 bits per pixel. You
@@ -184,20 +184,20 @@ interface
   ///
   /// @lib
   procedure ToggleFullScreen();
-  
+
   /// Returns whether fullscreen is enabled or not
   ///
   /// @returns: Boolean value for whether fullscreen is on or not
   ///
   /// @lib
   function IsFullScreen(): Boolean;
-  
+
   /// Toggle the Window border mode. This enables you to toggle from a bordered
   /// window to a borderless window.
   ///
   /// @lib
   procedure ToggleWindowBorder();
-  
+
   /// Returns the width of the screen currently displayed.
   ///
   /// @returns: The screen's width
@@ -230,13 +230,13 @@ interface
   ///
   /// @lib TakeScreenshot
   procedure TakeScreenshot(basename: String);
-  
-  
-  
+
+
+
   //----------------------------------------------------------------------------
   // Game-loop Essentials: WindowOpen, ProcessEvents, WindowClose
   //----------------------------------------------------------------------------
-  
+
   /// Checks to see if the window has been asked to close. You need to handle
   /// this if you want the game to end when the window is closed. This value
   /// is updated by the ProcessEvents routine.
@@ -245,7 +245,7 @@ interface
   ///
   /// @lib WindowCloseRequested
   function WindowCloseRequested(): Boolean;
-  
+
   /// ProcessEvents allows the SwinGame API to react to user interactions. This
   /// routine checks the current keyboard and mouse states. This routine must
   /// be called frequently within your game loop to enable user interaction.
@@ -256,12 +256,12 @@ interface
   ///
   /// @lib ProcessEvents
   procedure ProcessEvents();
-  
-  
+
+
   //----------------------------------------------------------------------------
   // Refreshing the screen
   //----------------------------------------------------------------------------
-  
+
   /// Draws the current drawing to the screen. This must be called to display
   /// anything to the screen. This will draw all drawing operations, as well
   /// as the text being entered by the user.
@@ -271,34 +271,34 @@ interface
   ///
   /// @lib RefreshScreen
   procedure RefreshScreen(); overload;
-  
-  /// Refresh with a target FPS. This will delay a period of time that will 
+
+  /// Refresh with a target FPS. This will delay a period of time that will
   /// approximately meet the targetted frames per second.
   ///
   /// @lib RefreshScreenRestrictFPS
   procedure RefreshScreen(TargetFPS: UInt32); overload;
-  
-  
+
+
   //----------------------------------------------------------------------------
   // Random
   //----------------------------------------------------------------------------
-  
+
   /// Generates a random number between 0 and 1.
   ///
   /// @lib
   function Rnd() : Single; overload;
-  
+
   /// Generates a random integer up to (but not including) ubound. Effectively,
   /// the ubound value specifies the number of random values to create.
   ///
   /// @lib RndUpto
   function Rnd(ubound: LongInt): LongInt; overload;
-  
-  
+
+
   //----------------------------------------------------------------------------
   // Color
   //----------------------------------------------------------------------------
-  
+
   /// Maps a color from a given bitmap. This is used when determining color
   /// keys for transparent images.
   ///
@@ -309,12 +309,12 @@ interface
   /// @lib ColorFromBitmap
   /// @sn colorFrom:%s apiColor:%s
   function ColorFrom(bmp: Bitmap; apiColor: Color): Color;
-  
+
   /// Creates and returns a random color where R, G, B and A are all randomised.
   ///
   /// @lib
   function RandomColor(): Color;
-  
+
   /// Creates and returns a random color where R, G, and B are all randomised, and A is set
   /// to the passed in value.
   ///
@@ -331,7 +331,7 @@ interface
   /// @lib
   /// @sn rgbaColorRed:%s green:%s blue:%s alpha:%s
   function RGBAColor(red, green, blue, alpha: Byte): Color;
-  
+
   /// Gets a color given its RGB components.
   ///
   /// @param red, green, blue:   Components of the color
@@ -341,7 +341,7 @@ interface
   /// @uname RGBColor
   /// @sn rgbColorRed:%s green:%s blue:%s
   function RGBColor(red, green, blue: Byte): Color;
-  
+
   /// Gets a color given its RGBA components.
   ///
   /// @lib
@@ -353,7 +353,7 @@ interface
   ///
   /// @lib
   function  ColorToString(c: Color): string;
-  
+
   /// Returns a color from a floating point RBG value set.
   ///
   /// @param r,g,b: Components for color 0 = none 1 = full
@@ -369,7 +369,7 @@ interface
   /// @lib
   /// @sn rgbaFloatColorRed:%s green:%s blue:%s alpha:%s
   function RGBAFloatColor(r,g,b, a: Single): Color;
-  
+
   /// Returs a color from the HSB input.
   ///
   /// @param hue, saturation, brightness: Values between 0 and 1
@@ -378,61 +378,61 @@ interface
   /// @lib
   /// @sn hsbColorHue:%s sat:%s bri:%s
   function HSBColor(hue, saturation, brightness: Single): Color;
-  
+
   /// Get the transpareny value of `color`.
   ///
   /// @lib
   function TransparencyOf(c: Color): byte;
-  
+
   /// Get the red value of `color`.
   ///
   /// @lib
   function RedOf(c: Color): byte;
-  
+
   /// Get the green value of `color`.
   ///
   /// @lib
   function GreenOf(c: Color): byte;
-  
+
   /// Get the blue value of `color`.
   ///
   /// @lib
   function BlueOf(c: Color): byte;
-  
+
   /// Gets the hue, saturation, and brightness values from
   /// the color.
   ///
   /// @lib
   /// @sn hsbValueOf:%s hue:%s sat:%s bri:%s
   procedure HSBValuesOf(c: Color; out h, s, b: Single);
-  
+
   /// Get the hue of the `color`.
   ///
   /// @lib
   function HueOf(c: Color): Single;
-  
+
   /// Get the saturation of the `color`.
   ///
   /// @lib
   function SaturationOf(c: Color) : Single;
-  
+
   /// Get the brightness of the `color`.
   ///
   /// @lib
   function BrightnessOf(c: Color) : Single;
-  
-  
+
+
   //----------------------------------------------------------------------------
   // Refresh / Delay / Framerate
   //----------------------------------------------------------------------------
-  
+
   /// Returns the average framerate for the last 10 frames as an integer.
   ///
   /// @returns     The current average framerate
   ///
   /// @lib
   function GetFramerate(): LongInt;
-  
+
   /// Gets the number of milliseconds that have passed. This can be used to
   /// determine timing operations, such as updating the game elements.
   ///
@@ -440,7 +440,7 @@ interface
   ///
   /// @lib
   function GetTicks(): UInt32;
-  
+
   /// Puts the process to sleep for a specified number of
   /// milliseconds. This can be used to add delays into your
   /// game.
@@ -452,15 +452,15 @@ interface
   ///
   /// @lib
   procedure Delay(time: UInt32);
-  
+
   /// Returns the calculated framerate averages, highest, and lowest values along with
   /// the suggested rendering color.
   ///
   /// @lib
   /// @sn calculateFramerateAvg:%s high:%s low:%s color:%s
   procedure CalculateFramerate(out average, highest, lowest: String; out textColor: Color);
-  
-  
+
+
   var
     //Preset colours, do not change these values.
     ColorBlue, ColorGreen, ColorRed, ColorWhite, ColorBlack, ColorYellow,
@@ -469,7 +469,7 @@ interface
 
 //=============================================================================
 implementation
-  uses 
+  uses
     SysUtils, Math, Classes, //System
     SDL_Image, SDL_gfx, //SDL
     sgSavePNG, sgShared, sgTrace, sgEventProcessing, //SwinGame shared library code
@@ -485,7 +485,7 @@ implementation
       max, min, avg: Single;
       ready: Boolean;
     end;
-    
+
   var
     // Timing details related to calculating FPS
     _lastUpdateTime: UInt32;
@@ -504,7 +504,7 @@ implementation
     {$IFDEF TRACE}
       TraceEnter('sgCore', '_InitFPSData');
     {$ENDIF}
-    
+
     // clear the array of values
     for i := Low(_fpsData.values) to High(_fpsData.values) do
       _fpsData.values[i] := 0;
@@ -578,13 +578,13 @@ implementation
     begin
       screen^.surface := SDL_CreateRGBSurface(SDL_HWSURFACE,
                                              ScreenWidth(), ScreenHeight(), 32,
-                                             RMask, GMask, BMask, 
+                                             RMask, GMask, BMask,
                                              $ffffffff and not RMask
                                                 and not GMask
                                                 and not BMask);
-      
+
       //WriteLn(RMask, ':', GMask, ':', BMask, ':', screen^.surface^.format^.AMask);
-      
+
       //Turn off alpha blending for when scr is blit onto _screen
       SDL_SetAlpha(screen^.surface, 0, 255);
       SDL_FillRect(screen^.surface, @screen^.surface^.clip_rect, 0);
@@ -654,7 +654,7 @@ implementation
       TraceExit('sgCore', 'SetIcon');
     {$ENDIF}
   end;
-  
+
   procedure OpenGraphicsWindow(caption: String; width: LongInt; height: LongInt; fullscreen, border, mouse, logo: Boolean); overload;
   begin
     {$IFDEF TRACE}
@@ -667,10 +667,10 @@ implementation
       exit;
     end;
 
-    try         
+    try
       _InitSDL(caption, width, height);
       _InitFPSData();
-      
+
       //Init the colors
       ColorWhite := RGBAColor(255, 255, 255, 255);
       ColorGreen := RGBAColor(0, 255, 0, 255);
@@ -684,10 +684,10 @@ implementation
       ColorMagenta := RGBAColor(255, 0, 255, 255);
       ColorTransparent := RGBAColor(0, 0, 0, 0);
       ColorLightGrey := RGBAColor(200, 200, 200, 255);
-      
+
       GUISetForegroundColor(ColorGreen);
       GUISetBackgroundColor(ColorBlack);
-      
+
       SDL_FillRect(screen^.surface, nil, ColorGrey);
       stringColor(screen^.surface, screenWidth div 2 - 30, screenHeight div 2, PChar('Loading ...'), ToGFXColor(ColorWhite));
       RefreshScreen();
@@ -697,17 +697,17 @@ implementation
         exit;
       end;
     end;
-    
+
     {$IFDEF TRACE}
       TraceIf(tlInfo, 'sgCore', 'Info', 'OpenGraphicsWindow', 'Window is open (' + caption + ' ' + IntToStr(width) + 'x' + IntToStr(height) + ')');
     {$ENDIF}
-    
+
     if fullscreen then
       ToggleFullScreen();
     if not border then
       ToggleWindowBorder();
     ShowMouse(mouse);
-    
+
 	if logo then
 		ShowLogos();
     LoadResourceBundle('FileDialog.txt');
@@ -715,7 +715,7 @@ implementation
       TraceExit('sgCore', 'OpenGraphicsWindow');
     {$ENDIF}
   end;
-  
+
 
   procedure OpenGraphicsWindow(caption: String); overload;
   begin
@@ -746,20 +746,20 @@ implementation
       TraceExit('sgCore', 'ToggleFullScreen');
     {$ENDIF}
   end;
-  
+
   function IsFullScreen(): Boolean;
   begin
     {$IFDEF TRACE}
       TraceEnter('sgCore', 'IsFullScreen');
     {$ENDIF}
-    
+
     result := (_screen^.flags and SDL_FULLSCREEN) > 0;
 
     {$IFDEF TRACE}
       TraceExit('sgCore', 'IsFullScreen');
     {$ENDIF}
   end;
-  
+
   procedure ToggleWindowBorder();
   var
     oldScr: PSDL_Surface;
@@ -768,7 +768,7 @@ implementation
       TraceEnter('sgCore', 'ToggleWindowBorder');
     {$ENDIF}
     oldScr := _screen;
-    
+
     try
       //Remember... _screen is a pointer to screen buffer, not a "surface"!
       _screen := SDL_SetVideoMode(oldScr^.w, oldScr^.h, 32, oldScr^.flags xor SDL_NOFRAME);
@@ -795,7 +795,7 @@ implementation
     if (width < 1) or (height < 1) then
     begin
       RaiseException('Screen Width and Height must be greater then 0 when resizing a Graphical Window');
-      exit; 
+      exit;
     end;
 
     if (width = ScreenWidth()) and (height = ScreenHeight()) then exit;
@@ -818,7 +818,7 @@ implementation
       RaiseException('Screen has not been created. Unable to get screen width.');
       exit;
     end;
-    
+
     result := _screen^.w;
     {$IFDEF TRACE}
       TraceExit('sgCore', 'ScreenWidth');
@@ -850,21 +850,21 @@ implementation
     {$IFDEF TRACE}
       TraceEnter('sgCore', 'TakeScreenShot');
     {$ENDIF}
-    
+
     path := IncludeTrailingPathDelimiter(GetUserDir()) + 'Desktop' + PathDelim;
-    if not DirectoryExists(path) then 
+    if not DirectoryExists(path) then
       path := IncludeTrailingPathDelimiter(GetUserDir());
-    
+
     filename := basename + '.png';
-    
+
     i := 1;
-    
+
     while FileExists(path + filename) do
     begin
       filename := basename + IntToStr(i) + '.png';
       i := i + 1;
     end;
-    
+
     //if SDL_SaveBMP(screen^.surface, PChar(path + filename)) = -1 then
     if not png_save_surface(path + filename, screen^.surface) then
     begin
@@ -934,7 +934,7 @@ implementation
       {$ENDIF}
       exit;
     end;
-    
+
     if _fpsData.avg = 0 then
       avg := 9999
     else
@@ -953,7 +953,7 @@ implementation
       textColor := ColorYellow
     else
       textColor := ColorGreen;
-    
+
     {$IFDEF TRACE}
       TraceExit('sgCore', 'CalculateFramerate');
     {$ENDIF}
@@ -971,13 +971,13 @@ implementation
     {$ENDIF}
       // insert the newValue as the position specified
       values[pos] := newValue;
-      
+
       // calculate the sum for the average
       sum := 0;
       for i := Low(values) to High(values) do
         sum := sum + values[i];
       result := sum / Length(values);
-      
+
       //Inc position index, and wrap-around to start if needed
       pos := pos + 1;
       if pos > High(values) then
@@ -993,9 +993,9 @@ implementation
     end;
   begin
     _fpsData.avg := RunningAverage(_fpsData.values, delta, _fpsData.pos);
-    
+
     if _fpsData.avg = 0.0 then _fpsData.avg := 0.01;
-    
+
     //Adjust the min/maxes
     if _fpsData.ready then
     begin
@@ -1075,10 +1075,10 @@ implementation
     sdlManager.DrawCollectedText(screen^.surface);
     SDL_BlitSurface(screen^.surface, nil, _screen, nil);
     SDL_Flip(_screen);
-    
+
     nowTime := GetTicks();
     delta := nowTime - _lastUpdateTime;
-    
+
     //dont sleep if 1ms remaining...
     while (delta + 1) * TargetFPS < 1000 do
     begin
@@ -1086,7 +1086,7 @@ implementation
       Delay(delayTime);
       nowTime := GetTicks();
       delta := nowTime - _lastUpdateTime;
-    end;  
+    end;
 
     _UpdateFPSData(delta);
     _lastUpdateTime := nowTime;
@@ -1177,7 +1177,7 @@ implementation
       TraceExit('sgCore', 'TransparencyOf');
     {$ENDIF}
   end;
-  
+
   procedure HSBValuesOf(c: Color; out h, s, b: Single);
   var
     red, green, blue, alpha: byte;
@@ -1188,21 +1188,21 @@ implementation
       TraceEnter('sgCore', 'HSBValuesOf');
     {$ENDIF}
      H := 0.0 ;
-     
+
      ColorComponents(c, red, green, blue, alpha);
-     
+
      rf := red / 255;
      gf := green / 255;
      bf := blue / 255;
-     
+
      minRGB := Min(Min(rf, gf), bf);
      maxRGB := Max(Max(rf, gf), bf);
      delta := (maxRGB - minRGB);
-     
+
      b := maxRGB;
      if (maxRGB <> 0.0) then s := delta / maxRGB
      else s := 0.0;
-      
+
      if (s <> 0.0) then
      begin
        if rf = maxRGB then h := (gf - bf) / Delta
@@ -1214,13 +1214,13 @@ implementation
      else h := -1.0;
      h := h * 60 ;
      if h < 0.0 then h := h + 360.0;
-       
+
      h := h / 360.0;
     {$IFDEF TRACE}
       TraceExit('sgCore', 'HSBValuesOf');
     {$ENDIF}
   end;
-  
+
   function HueOf(c: Color) : Single;
   var
     s, b: Single;
@@ -1233,7 +1233,7 @@ implementation
       TraceExit('sgCore', 'HueOf');
     {$ENDIF}
   end;
-  
+
   function SaturationOf(c: Color) : Single;
   var
     h, b: Single;
@@ -1246,7 +1246,7 @@ implementation
       TraceExit('sgCore', 'SaturationOf');
     {$ENDIF}
   end;
-  
+
   function BrightnessOf(c: Color) : Single;
   var
     h, s: Single;
@@ -1259,8 +1259,8 @@ implementation
       TraceExit('sgCore', 'BrightnessOf');
     {$ENDIF}
   end;
-  
-  function ColorFrom(bmp: Bitmap; apiColor: Color): Color; overload;
+
+  function ColorFrom(bmp: Bitmap; apiColor: Color): Color;
   var
     r,g,b,a: Byte;
   begin
@@ -1272,16 +1272,16 @@ implementation
       RaiseException('Unable to get color as bitmap not specified');
       exit;
     end;
-    
+
     ColorComponents(apiColor, r, g, b, a);
-    
+
     result := SDL_MapRGBA(bmp^.surface^.format, r, g, b, a);
     {$IFDEF TRACE}
       TraceExit('sgCore', 'ColorFrom');
     {$ENDIF}
   end;
 
-  function RGBAColor(red, green, blue, alpha: Byte): Color; overload;
+  function RGBAColor(red, green, blue, alpha: Byte): Color;
   begin
     {$IFDEF TRACE}
       TraceEnter('sgCore', 'RGBAColor');
@@ -1324,7 +1324,7 @@ implementation
       TraceExit('sgCore', 'RGBFloatColor');
     {$ENDIF}
   end;
-  
+
   function RGBAFloatColor(r,g,b, a: Single): Color;
   begin
     {$IFDEF TRACE}
@@ -1404,7 +1404,7 @@ implementation
       TraceExit('sgCore', 'HSBColor');
     {$ENDIF}
   end;
-  
+
   function RandomColor(): Color;
   begin
     {$IFDEF TRACE}
@@ -1415,7 +1415,7 @@ implementation
       TraceExit('sgCore', 'RandomColor');
     {$ENDIF}
   end;
-  
+
   function RandomRGBColor(alpha: Byte): Color;
   begin
     {$IFDEF TRACE}
@@ -1426,11 +1426,11 @@ implementation
       TraceExit('sgCore', 'RandomRGBColor');
     {$ENDIF}
   end;
-  
+
   //----------------------------------------------------------------------------
   // Random
   //----------------------------------------------------------------------------
-  
+
   function Rnd() : Single; overload;
   begin
     {$IFDEF TRACE}
@@ -1441,7 +1441,7 @@ implementation
       TraceExit('sgCore', 'Rnd');
     {$ENDIF}
   end;
-  
+
   function Rnd(ubound: LongInt): LongInt; overload;
   begin
     {$IFDEF TRACE}
@@ -1461,9 +1461,9 @@ implementation
     {$IFDEF TRACE}
       TraceEnter('sgCore', 'initialization');
     {$ENDIF}
-  
+
     InitialiseSwinGame();
-  
+
     {$IFDEF TRACE}
       TraceExit('sgCore', 'initialization');
     {$ENDIF}
@@ -1476,9 +1476,9 @@ implementation
     {$IFDEF TRACE}
       TraceEnter('sgCore', 'finalization');
     {$ENDIF}
-    
+
     RegisterFreeNotifier(nil);
-    
+
     {$IFDEF TRACE}
       TraceExit('sgCore', 'finalization');
     {$ENDIF}

@@ -40,84 +40,84 @@ interface
   //----------------------------------------------------------------------------
   // Bundle handling routines
   //----------------------------------------------------------------------------
-  
+
   /// Load a resource bundle showing load progress.
   ///
   /// @lib
   /// @sn loadResourceBundleNamed:%s showingProgress:%s
   procedure LoadResourceBundle(name: String; showProgress: Boolean); overload;
-  
+
   /// Load a resource bundle showing load progress.
-  /// 
+  ///
   /// @lib LoadResourceBundle(name, True)
   /// @uname LoadResourceBundleWithProgress
   procedure LoadResourceBundle(name: String); overload;
-  
+
   /// Load a resource bundle mapping it to a given name, showing progress.
-  /// 
+  ///
   /// @lib
   /// @sn mapResourceBundle:%s filename:%s showProgress:%s
   procedure MapResourceBundle(name, filename: String; showProgress: Boolean);
-  
+
   /// Release the resource bundle with the given name.
-  /// 
+  ///
   /// @lib
   procedure ReleaseResourceBundle(name: String);
-  
+
   /// Returns true if the resource bundle is loaded.
-  /// 
+  ///
   /// @lib
   function HasResourceBundle(name: String): Boolean;
-  
-  
+
+
   //----------------------------------------------------------------------------
   // Release all resources procedure
   //----------------------------------------------------------------------------
-  
+
   /// Release all of the resources loaded by SwinGame.
-  /// 
+  ///
   /// @lib
   procedure ReleaseAllResources();
-  
-  
+
+
   //----------------------------------------------------------------------------
   // Resource Path and Application Path
   //----------------------------------------------------------------------------
-  
+
   /// Returns the path to a resource based on a base path and a the resource kind.
   ///
   /// @lib
   /// @sn pathToResourceBase:%s filename:%s resourceKind:%s
   function PathToResourceWithBase(path, filename: String; kind: ResourceKind): String; overload; // forward;
-  
+
   /// Returns the path to a resource based on a base path and a the resource kind.
   ///
   /// @lib PathToOtherResourceWithBase
   /// @sn pathToResourceBase:%s filename:%s
   function PathToResourceWithBase(path, filename: String): String; overload; // forward;
-  
+
   /// Returns the path to a resource given its filename, kind, and any subPaths. For example: to load
   /// the image 'bullet01.png' from the 'bullets' subdirectory you pass in 'bullet01.png' as the filename,
   /// ImageResource as the kind, and 'bullets' as the subPaths. This will then return the full path
-  /// to the resource according to the platform in question. 
+  /// to the resource according to the platform in question.
   /// For example: .../Resources/images/bullets/bullet01.png
-  /// 
+  ///
   /// @lib PathToResourceWithSubPaths
   /// @sn pathToResourceFilename:%s kind:%s subPaths:%s
   function PathToResource(filename: String; kind: ResourceKind; subPaths: StringArray): String; overload;
-  
+
   /// Returns the path to the filename for a given file resource.
-  /// 
+  ///
   /// @lib PathToResource
   /// @sn pathToResourceFilename:%s kind:%s
   function PathToResource(filename: String; kind: ResourceKind): String; overload;
-  
+
   /// Returns the path to the filename within the game's resources folder.
-  /// 
+  ///
   /// @lib PathToOtherResource
   /// @sn pathToResourceFilename:%s
   function PathToResource(filename: String): String; overload;
-  
+
   /// Returns the path to the file with the passed in name for a given resource
   /// kind. This checks if the path exists, throwing an exception if the file
   /// does not exist in the expected locations.
@@ -125,49 +125,49 @@ interface
   /// @lib
   /// @sn filenameFor:%s ofKind:%s
   function FilenameToResource(name: String; kind: ResourceKind): String;
-  
+
   /// Sets the path to the executable. This path is used for locating game
   /// resources.
-  /// 
+  ///
   /// @lib SetAppPathWithExe
   /// @sn setAppPath:%s withExe:%s
   procedure SetAppPath(path: String; withExe: Boolean); overload;
-  
+
   /// Sets the path to the executable. This path is used for locating game
   /// resources.
-  /// 
+  ///
   /// @lib SetAppPath
   procedure SetAppPath(path: String); overload;
-  
+
   /// Returns the application path set within SwinGame. This is the path
   /// used to determine the location of the game's resources.
   ///
   /// @lib
   function AppPath(): String;
-  
-  
+
+
   //----------------------------------------------------------------------------
   // Startup related code
   //----------------------------------------------------------------------------
-  
+
   /// Show the Swinburne and SwinGame logos for 1 second
   ///
   /// @lib
   procedure ShowLogos();
-  
-  
+
+
   //----------------------------------------------------------------------------
   // Notifier of resource freeing
   //----------------------------------------------------------------------------
-  
+
   /// Using this procedure you can register a callback that is executed
   /// each time a resource is freed. This is called by different versions of
   /// SwinGame to keep track of resources and should not be called by user code.
   ///
   /// @lib
   procedure RegisterFreeNotifier(fn: FreeNotifier);
-  
-  
+
+
 //=============================================================================
 implementation
 //=============================================================================
@@ -175,7 +175,7 @@ implementation
   uses SysUtils, StrUtils, Classes, // system
        stringhash, sgUtils,      // libsrc
        SDL, SDL_Mixer, SDL_ttf, SDL_Image,
-       sgCore, sgText, sgAudio, sgGraphics, sgInput, sgCharacters, sgShared, 
+       sgCore, sgText, sgAudio, sgGraphics, sgInput, sgCharacters, sgShared,
        sgSprites, sgTrace, sgImages, sgAnimations, sgUserInterface, sgMaps; // Swingame
 
   //----------------------------------------------------------------------------
@@ -187,8 +187,8 @@ implementation
     // The full path location of the current executable (or script). This is
     // particuarly useful when determining the path to resources (images, maps,
     // sounds, music etc).
-    
-  
+
+
   procedure RegisterFreeNotifier(fn: FreeNotifier);
   begin
     {$IFDEF TRACE}
@@ -201,12 +201,12 @@ implementation
     {$ENDIF}
 
   end;
-  
+
   //----------------------------------------------------------------------------
   // Private types
   //----------------------------------------------------------------------------
-  
-  type 
+
+  type
     //
     // Used in loading bundles
     //
@@ -215,7 +215,7 @@ implementation
       data: Array of LongInt;
       kind: ResourceKind;
     end;
-    
+
     //
     // Used to store bundle details
     //
@@ -249,7 +249,7 @@ implementation
   var
     current: tResourceIdentifier;
     i: LongInt;
-    
+
     procedure rbLoadFont();
     begin
       if Length(current.data) <> 1 then
@@ -259,13 +259,13 @@ implementation
       end;
       MapFont(current.name, current.path, current.data[0])
     end;
-    
+
     procedure rbLoadBitmap();
     var
       bmp: Bitmap;
     begin
       bmp := MapBitmap(current.name, current.path);
-      
+
       if Length(current.data) > 0 then
       begin
         if Length(current.data) <> 5 then
@@ -273,16 +273,16 @@ implementation
             RaiseException('Invalid number of values for bitmap ' + current.name + ' expected 5 values for width, height, cellRows, cellCols, cellCount');
             exit;
         end;
-        
+
         BitmapSetCellDetails(bmp, current.data[0], current.data[1], current.data[2], current.data[3], current.data[4]);
       end;
     end;
-    
+
   begin
     for i := Low(identifiers) to High(identifiers) do
     begin
       current := identifiers[i];
-      
+
       if current.kind = kind then
       begin
         case kind of
@@ -309,13 +309,13 @@ implementation
     {$IFDEF TRACE}
       TraceEnter('sgResources', 'TResourceBundle.LoadResources');
     {$ENDIF}
-    
+
     for kind := Low(ResourceKind) to High(ResourceKind) do
     begin
       {$IFDEF TRACE}
         Trace('sgResources', 'Info', 'TResourceBundle.LoadResources', 'Calling for ' + IntToStr(LongInt(kind)));
       {$ENDIF}
-      LoadResources(showProgress, kind);      
+      LoadResources(showProgress, kind);
     end;
     {$IFDEF TRACE}
       TraceExit('sgResources', 'TResourceBundle.LoadResources');
@@ -327,7 +327,7 @@ implementation
     current: tResourceIdentifier;
     i: LongInt;
   begin
-  
+
     for i := Low(identifiers) to High(identifiers) do
     begin
       current := identifiers[i];
@@ -348,7 +348,7 @@ implementation
   end;
 
   //----------------------------------------------------------------------------
-  
+
   procedure ReleaseAllResources();
   begin
     ReleaseAllAnimationTemplates();
@@ -361,9 +361,9 @@ implementation
     ReleaseAllCharacters();
     _Bundles.deleteAll();
   end;
-  
+
   //----------------------------------------------------------------------------
-  
+
   function StringToResourceKind(kind: String): ResourceKind;
   begin
     kind := Uppercase(Trim(kind));
@@ -378,15 +378,15 @@ implementation
     else if kind = 'CHARACTER'  then result := CharacterResource
     else result := OtherResource;
   end;
-  
+
   function FilenameToResource(name: String; kind: ResourceKind): String;
   begin
     result := name;
-    
+
     if not FileExists(result) then
     begin
       result := PathToResource(name, kind);
-      
+
       if not FileExists(result) then
       begin
         RaiseException('Unable to locate resource at ' + result);
@@ -395,14 +395,14 @@ implementation
       end;
     end;
   end;
-  
+
   //----------------------------------------------------------------------------
-  
+
   procedure LoadResourceBundle(name: String; showProgress: Boolean); overload;
   begin
     MapResourceBundle(name, name, showProgress);
   end;
-  
+
   // Called to read in each line of the resource bundle.
   // ptr is a pointer to a tResourceBundle to load details into
   procedure ProcessBundleLine(const line: LineData; ptr: Pointer);
@@ -412,28 +412,28 @@ implementation
     current: tResourceIdentifier;
   begin
     delim := [ ',' ]; //comma delimited
-    
+
     current.kind := StringToResourceKind(ExtractDelimited(1, line.data, delim));
     current.name := ExtractDelimited(2, line.data, delim);
-    
-    if Length(current.name) = 0 then 
+
+    if Length(current.name) = 0 then
     begin
       RaiseException('No name for resource.');
       exit;
     end;
-    
+
     current.path := ExtractDelimited(3, line.data, delim);
-    
-    if Length(current.path) = 0 then 
+
+    if Length(current.path) = 0 then
     begin
       RaiseException('No path supplied for resource.');
       exit;
     end;
-    
+
     if CountDelimiter(line.data, ',') > 2 then
     begin
       SetLength(current.data, CountDelimiter(line.data, ',') - 2);
-      
+
       for i := 4 to CountDelimiter(line.data, ',') + 1 do //Start reading from the 4th position (after the 3rd ,)
       begin
         if not TryStrToInt(ExtractDelimited(i, line.data, delim), current.data[i - 4]) then
@@ -447,11 +447,11 @@ implementation
     begin
       SetLength(current.data, 0);
     end;
-      
+
     //WriteLn('Bundle: ', current.name, ' - ', current.path, ' - ', current.size);
     tResourceBundle(ptr).add(current);
   end;
-    
+
   procedure MapResourceBundle(name, filename: String; showProgress: Boolean);
   var
     bndl: tResourceBundle;
@@ -459,17 +459,17 @@ implementation
     {$IFDEF TRACE}
       TraceEnter('sgResources', 'LoadResourceBundle');
     {$ENDIF}
-    
+
     if _Bundles.containsKey(name) then
     begin
       RaiseException('Error loaded Resource Bundle resource twice, ' + name);
       exit;
     end;
-    
+
     bndl := tResourceBundle.Create();
     ProcessLinesInFile(filename, BundleResource, @ProcessBundleLine, bndl);
     bndl.LoadResources(showProgress);
-  
+
     if not _Bundles.setValue(name, bndl) then //store bundle
     begin
       bndl.ReleaseResources();
@@ -477,22 +477,22 @@ implementation
       RaiseException('Error loaded Bundle twice, ' + name);
       exit;
     end;
-    
+
     {$IFDEF TRACE}
       TraceExit('sgResources', 'LoadResourceBundle');
     {$ENDIF}
   end;
-  
+
   procedure LoadResourceBundle(name: String); overload;
   begin
     LoadResourceBundle(name, True);
   end;
-  
+
   function HasResourceBundle(name: String): Boolean;
   begin
     result := _Bundles.containsKey(name);
   end;
-  
+
   procedure ReleaseResourceBundle(name: String);
   var
     bndl: tResourceBundle;
@@ -504,12 +504,12 @@ implementation
       bndl.Free();
     end;
   end;
-  
+
   //----------------------------------------------------------------------------
-  
-  
-  
-  
+
+
+
+
   function PathToResourceWithBase(path, filename: String; kind: ResourceKind): String; overload;
   begin
     case kind of
@@ -532,11 +532,11 @@ implementation
       PanelResource:      result := PathToResourceWithBase(path, 'panels\' + filename);
       CharacterResource:  result := PathToResourceWithBase(path, 'characters\' + filename);
     {$endif}
-      
+
       else result := PathToResourceWithBase(path, filename);
     end;
   end;
-  
+
   function PathToResourceWithBase(path, filename: String): String; overload;
   begin
     {$ifdef UNIX}
@@ -551,17 +551,17 @@ implementation
     {$endif}
     result := result + filename;
   end;
-  
+
   function PathToResource(filename: String): String; overload;
   begin
     result := PathToResourceWithBase(applicationPath, filename);
   end;
-  
+
   function PathToResource(filename: String; kind: ResourceKind): String; overload;
   begin
     result := PathToResourceWithBase(applicationPath, filename, kind);
   end;
-  
+
   function PathToResource(filename: String; kind: ResourceKind; subPaths: StringArray): String; overload;
   var
     temp: String;
@@ -570,7 +570,7 @@ implementation
     if Length(subPaths) > 0 then
     begin
       temp := '';
-      
+
       for i := 0 to High(subPaths) do
       begin
         {$ifdef UNIX}
@@ -579,32 +579,32 @@ implementation
           temp := temp + subPaths[i] + '\';
         {$endif}
       end;
-      
+
       filename := temp + filename;
     end;
-    
+
     result := PathToResource(filename, kind)
   end;
-  
+
   procedure SetAppPath(path: String); overload;
   begin
     SetAppPath(path, True);
   end;
-  
+
   procedure SetAppPath(path: String; withExe: Boolean);
   begin
     if withExe then applicationPath := ExtractFileDir(path)
     else applicationPath := path;
   end;
-  
+
   function AppPath(): String;
   begin
     result := applicationPath;
   end;
-  
-  
+
+
 //----------------------------------------------------------------------------
-  
+
   procedure ShowLogos();
   const
     ANI_X = 143;
@@ -622,7 +622,7 @@ implementation
     isPaused: Boolean;
     isSkip: Boolean;
     startAni: Animation;
-    
+
     procedure InnerProcessEvents();
     begin
       ProcessEvents();
@@ -633,10 +633,10 @@ implementation
       if WindowCloseRequested() or KeyDown(vk_Escape) then isSkip := true;
     end;
   begin
-    
+
     isPaused := false;
     isSkip := false;
-    
+
     {$IFDEF TRACE}
       TraceEnter('sgResources', 'ShowLogos');
     {$ENDIF}
@@ -648,9 +648,9 @@ implementation
         oldH := ScreenHeight();
         if (oldW < 800) or (oldH < 600) then
           ChangeScreenSize(800, 600);
-        
+
         LoadResourceBundle('splash.txt', False);
-        
+
         ClearScreen();
         DrawBitmap(BitmapNamed('Swinburne'), 286 + XOffset, 171 + YOffset);
         f := FontNamed('ArialLarge');
@@ -658,7 +658,7 @@ implementation
         DrawText(txt, ColorWhite, f, ((ScreenWidth() - TextWidth(f, txt)) div 2), 500 + YOffset);
         f := FontNamed('LoadingFont');
         DrawText(DLL_VERSION, ColorWhite, f, 5 + XOffset, 580 + YOffset);
-        
+
         i := 1;
         while isPaused or (i < 60) do
         begin
@@ -667,28 +667,28 @@ implementation
           RefreshScreen(60);
           if isSkip then break;
         end;
-        
+
         startAni := CreateAnimation('splash', AnimationTemplateNamed('Startup'));
-        
+
         while not AnimationEnded(startAni) do
         begin
           DrawBitmap(BitmapNamed('SplashBack'), 0 + XOffset, 0 + YOffset);
-          
+
           DrawAnimation(startAni, BitmapNamed('SwinGameAni'), ANI_X + XOffset, ANI_Y + YOffset);
           UpdateAnimation(startAni);
-          
+
           RefreshScreen();
           InnerProcessEvents();
           if isSkip then break;
-          Delay(15);          
+          Delay(15);
         end;
-        
+
         while SoundEffectPlaying(SoundEffectNamed('SwinGameStart')) or isPaused do
         begin
           InnerProcessEvents();
           if isSkip then break;
         end;
-        
+
       except on e:Exception do
         {$IFDEF TRACE}
         begin
@@ -708,16 +708,16 @@ implementation
          end;
         {$ENDIF}
       end;
-      
+
       if (oldW < 800) or (oldH < 600) then
         ChangeScreenSize(oldW, oldH);
     end;
-    
+
     {$IFDEF TRACE}
       TraceExit('sgResources', 'ShowLogos');
     {$ENDIF}
   end;
-  
+
 
 
 //=============================================================================
@@ -727,16 +727,16 @@ implementation
     {$IFDEF TRACE}
       TraceEnter('sgResources', 'initialization');
     {$ENDIF}
-    
+
     InitialiseSwinGame();
-    
+
     _Bundles := TStringHash.Create(False, 1024);
-    
+
     try
         if ParamCount() >= 0 then SetAppPath(ParamStr(0), True)
     except
     end;
-    
+
     {$IFDEF TRACE}
       TraceExit('sgResources', 'initialization');
     {$ENDIF}

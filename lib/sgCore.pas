@@ -1018,10 +1018,14 @@ implementation
     {$IFDEF TRACE}
       TraceEnter('sgCore', 'WindowCloseRequested');
     {$ENDIF}
-    if sdlManager = nil then
-      result := false
-    else
+
+    if sdlManager = nil then begin
+      result := false;
+    end
+    else begin
       result := sdlManager.HasQuit();
+    end;
+
     {$IFDEF TRACE}
       TraceExit('sgCore', 'WindowCloseRequested');
     {$ENDIF}

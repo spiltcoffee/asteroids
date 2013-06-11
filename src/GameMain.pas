@@ -7,7 +7,7 @@
 
 program GameMain;
 {$IFNDEF UNIX} {$r GameLauncher.res} {$ENDIF}
-uses sgCore, sgResources, asAudio, asConstants, asGameLoop, asLogo, asMenuCommands, asTypes;
+uses sgCore, sgResources, asAudio, asConstants, asGameLoop, asLogo, asMenuCommands, asTypes, SysUtils;
 
 procedure Main();
 var
@@ -25,9 +25,9 @@ begin
 
   OpenGraphicsWindow('Asteroids', state.res.width, state.res.height, state.fullscreen, true, false, true);
   ShowMyLogo();
-  
+
   SetupGame(state,menu,player,enemy,asteroids,bullets,debris,notes);
-  
+
   repeat // The game loop...
     GameProcessEvents(state,menu);
     CreateObjects(state,menu,player,enemy,asteroids,bullets);
@@ -39,6 +39,11 @@ begin
 
   EndAudio();
   ReleaseAllResources();
+  try
+    Halt(0);
+  except on Exception do
+    WriteLn('Exception On Close');
+  end;
 end;
 
 begin

@@ -4,33 +4,33 @@ interface
   uses asTypes;
 
   procedure CreatePlayer(var player: TShip);
-  
+
   procedure ResetPlayer(var player: TShip; var state: TState);
-  
+
   procedure SpawnPlayer(var player: TShip; var state: TState);
-  
+
   procedure KillPlayer(var player: TShip; var state: TState; var debris: TDebrisArray; var notes: TNoteArray);
-  
+
   procedure MovePlayer(var player: TShip; const state: TState);
-  
-  procedure DrawPlayer(const player: TShip);  
+
+  procedure DrawPlayer(const player: TShip);
 
 implementation
   uses sgCore, sgGeometry, sgInput, sgTypes, asAudio, asConstants, asDraw, asEffects, asNotes, asOffscreen;
   procedure CreatePlayer(var player: TShip);
   begin
     player.kind := SK_PLAYER;
-    
+
     player.rad := 9;
-    
+
     player.pos.x := ScreenWidth() / 2;
     player.pos.y := ScreenHeight() / 2;
-    
+
     player.rot := 270;
-    
+
     player.vel.x := 0;
     player.vel.y := 0;
-    
+
     player.last := -1;
     player.alive := false;
     player.shields := PLAYER_SHIELD_HIGH;
@@ -43,18 +43,18 @@ implementation
   begin
     player.pos.x := ScreenWidth() / 2;
     player.pos.y := ScreenHeight() / 2;
-    
+
     player.rot := 270;
-    
+
     player.vel.x := 0;
     player.vel.y := 0;
-    
+
     player.last := -1;
     player.alive := true;
     player.shields := PLAYER_SHIELD_HIGH;
     player.int := 0;
     player.thrust := false;
-    
+
     state.lives -= 1;
   end;
 
@@ -83,12 +83,12 @@ implementation
       player.rot -= PLAYER_ROTATION_SPEED
     else if KeyDown(VK_RIGHT) and not KeyDown(VK_LEFT) then
       player.rot += PLAYER_ROTATION_SPEED;
-    
+
     if player.rot < 0 then
       player.rot += 360
     else if player.rot > 360 then
       player.rot -= 360;
-    
+
     if KeyDown(VK_UP) then
     begin
       StartThrusterEffect(state);
@@ -103,10 +103,10 @@ implementation
 
     player.pos += player.vel;
     WrapPosition(player.pos);
-      
+
     if (player.shields < PLAYER_SHIELD_HIGH) then
       player.shields += 1;
-      
+
     if player.int > 0 then
       player.int -= 1;
   end;
@@ -126,11 +126,11 @@ implementation
     else if (player.shields < PLAYER_SHIELD_HIGH) then
       shipColor := $01000100 * Trunc((0.5 * Cosine((player.shields mod 20) * 180 / 10) + 0.5) * 255) + $01010000 * Trunc((0.5 * Cosine((player.shields mod 20) * 180 / 10 + 180) + 0.5) * 255);
 
-    DrawShape(PlayerShip(),player.pos,player.rot,shipColor);
+    DrawShape(ShipPoints,player.pos,player.rot,shipColor);
 
     if KeyDown(VK_UP) and player.thrust then
     begin
-      thrusterPoints := Copy(PlayerShip(),1,3);
+      thrusterPoints := Copy(ShipPoints,1,3);
       thrusterPoints[1].x -= PLAYER_THRUST_AMPLITUDE;
       DrawShape(thrusterPoints,player.pos,player.rot,thrustColor,false);
     end;

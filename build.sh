@@ -21,18 +21,18 @@ APP_PATH=`cd "$APP_PATH"; pwd`
 cd "$APP_PATH"
 
 #Set the basic paths
-OUT_DIR="${APP_PATH}/../asteroids.out/master"
+OUT_DIR="${APP_PATH}/../out"
 TMP_DIR="${APP_PATH}/tmp"
 SRC_DIR="${APP_PATH}/src"
 LIB_DIR="${APP_PATH}/lib"
 LOG_FILE="${APP_PATH}/out.log"
 
-PAS_FLAGS="-O3 -vw"
+PAS_FLAGS="-O3 -vw -gl"
 SG_INC="-Fu${APP_PATH}/lib/"
 
 FPC_BIN=`which fpc`
 
-GAME_NAME=${APP_PATH##*/}
+GAME_NAME="asteroids" #${APP_PATH##*/}
 ICON=SwinGame
 
 CLEAN="N"
@@ -170,7 +170,7 @@ doMacPackage()
     echo "  ... Added Private Frameworks"
     cp -R -p "${LIB_DIR}/"*.framework "${GAMEAPP_PATH}/Contents/Frameworks/"
 
-    cp -R -p "${OUT_DIR}/${GAME_NAME}" "${GAMEAPP_PATH}/Contents/MacOS/"
+    mv "${OUT_DIR}/${GAME_NAME}" "${GAMEAPP_PATH}/Contents/MacOS/"
 
     echo "<?xml version='1.0' encoding='UTF-8'?>\
     <!DOCTYPE plist PUBLIC \"-//Apple Computer//DTD PLIST 1.0//EN\" \"http://www.apple.com/DTDs/PropertyList-1.0.dtd\">\

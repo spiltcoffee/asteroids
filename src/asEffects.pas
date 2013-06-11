@@ -32,8 +32,8 @@ implementation
       SetLength(bullets,Length(bullets) + 1);
       new := High(bullets);
 
-      point := CopyRotateTranslate(PlayerShip(true),shooter.pos,shooter.rot);
-      
+      point := CopyRotateTranslate(ShipPoints(true),shooter.pos,shooter.rot);
+
       bullets[new].pos := point[0]; //rotate, then translate
       bullets[new].vel := shooter.vel + VectorFromAngle(shooter.rot,BULLET_SPEED);
       bullets[new].life := BULLET_START;
@@ -55,7 +55,7 @@ implementation
         new := High(bullets);
 
         angle := CalculateAngleWithWrap(shooter.pos + shooter.vel * time,target.pos + target.vel * time);
-      
+
         bullets[new].pos := shooter.pos + VectorFromAngle(angle,shooter.rad);
         bullets[new].vel := shooter.vel + VectorFromAngle(angle,BULLET_SPEED);
         bullets[new].life := BULLET_START;
@@ -102,7 +102,7 @@ implementation
 
       if i < High(drawingPoints) then
         nextPoint := drawingPoints[i + 1]
-      else 
+      else
         nextPoint := drawingPoints[0];
 
       debris[new].pos := LineMidPoint(drawingPoints[i],nextPoint);
@@ -130,7 +130,7 @@ implementation
   begin
     if ship.kind = SK_PLAYER then
     begin
-      drawingPoints := CopyRotateTranslate(PlayerShip(),ship.pos,ship.rot); //so we don't modify the original array of points
+      drawingPoints := CopyRotateTranslate(ShipPoints,ship.pos,ship.rot); //so we don't modify the original array of points
 
       for i := 0 to High(drawingPoints) do
       begin
@@ -139,7 +139,7 @@ implementation
 
         if i < High(drawingPoints) then
           nextPoint := drawingPoints[i + 1]
-        else 
+        else
           nextPoint := drawingPoints[0];
 
         debris[new].pos := LineMidPoint(drawingPoints[i],nextPoint);
@@ -152,7 +152,7 @@ implementation
         debris[new].rot.speed := (Rnd() - 0.5) * 2 * DEBRIS_MAXROTATION;
 
         debris[new].vel := ship.vel + VectorFromAngle(CalculateAngleBetween(ship.pos,debris[new].pos),DEBRIS_SPEED_MODIFIER * (Rnd() - 0.5));
-    
+
         debris[new].life := DEBRIS_START;
         debris[new].kind := Line;
         debris[new].col := ColorGreen;
@@ -177,7 +177,7 @@ implementation
 
         debris[new].vel := ship.vel + VectorFromAngle(Rnd(360),DEBRIS_SPEED_MODIFIER * (Rnd() - 0.5));// * Cosine(CalculateAngle(player.pos.x,player.pos.y,debris[new].pos.x,debris[new].pos.y));
         //debris[new].vel.y := player.vel.y + DEBRIS_SPEED_MODIFIER * (Rnd() - 0.5) * Sine(CalculateAngle(player.pos.x,player.pos.y,debris[new].pos.x,debris[new].pos.y));
-        
+
         debris[new].life := DEBRIS_START;
         debris[new].kind := Circle;
         debris[new].col := $FFFF9900;
@@ -189,7 +189,7 @@ implementation
   begin
     bullet.pos += bullet.vel;
     WrapPosition(bullet.pos);
-    
+
     bullet.life -= 1;
   end;
 
@@ -202,13 +202,13 @@ implementation
     end;
     debris.pos += debris.vel;
     WrapPosition(debris.pos);
-    
+
     debris.rot.angle += debris.rot.speed;
     if debris.rot.angle < 0 then
       debris.rot.angle += 360
     else if debris.rot.angle > 360 then
       debris.rot.angle -= 360;
-    
+
     debris.life -= 1;
   end;
 

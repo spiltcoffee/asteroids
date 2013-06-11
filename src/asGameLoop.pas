@@ -19,7 +19,7 @@ implementation
   uses sgCamera, sgCore, sgGeometry, sgGraphics, sgInput, sgTypes, asAsteroids, asAudio,
        asCollisions, asConstants, asDraw, asEnemy, asEffects, asExtras, asMenu, asNotes,
        asPlayer, asState
-       
+
        {REMOVE}, SysUtils;
 
   procedure GameProcessEvents(var state: TState; var menu: TMenu);
@@ -42,6 +42,8 @@ implementation
         PlayMenuChangeEffect(state);
       end;
     end
+    else if (KeyDown(VK_LMETA) or KeyDown(VK_RMETA)) and KeyTyped(VK_Q) then
+      state.quit := true
     else if (KeyDown(VK_LALT) or KeyDown(VK_RALT)) and KeyTyped(VK_RETURN) then
     begin
       ToggleFullScreen();
@@ -60,18 +62,18 @@ implementation
     state.transition := FadeIn;
     state.time := STATE_FADE_TIME;
     state.perform := NoCommand;
-    
+
     SetupMenu(menu);
 
     CreatePlayer(player);
-    
+
     SetupEnemy(enemy);
-    
+
     SetLength(asteroids,0);
-    
+
     while NeedMoreAsteroids(state.score, asteroids) do
       CreateAsteroid(asteroids,player);
-    
+
     SetLength(bullets,0);
     SetLength(debris,0);
     SetLength(notes,0);
@@ -119,7 +121,7 @@ implementation
       end;
     end;
   end;
-  
+
   procedure CollideObjects(var state: TState; var player, enemy: TShip; var asteroids: TAsteroidArray; var bullets: TBulletArray; var debris: TDebrisArray; var notes: TNoteArray);
   var
     i, j, new, cur, del: Integer;
@@ -153,11 +155,11 @@ implementation
           KillEnemy(enemy,state,debris,notes);
         end;
       end;
-      
+
       ///                 ///
       //ASTEROID COLLISIONS//
       ///                 ///
-      
+
       //initialise new ignore collision array
       SetLength(ignoreCollision, 0);
       //initialise collision array
@@ -169,7 +171,7 @@ implementation
       end;
       //initialise destroy array
       SetLength(destroy,0);
-      
+
       //while i < asteroids.length
       for i := 0 to High(asteroids) - 1 do begin
         //while j = i + 1; j < asteroids.length
@@ -198,7 +200,7 @@ implementation
           end;
         end;
       end;
-      
+
       cur := 0;
       //while collision array
       while (cur < Length(collision)) do begin
@@ -206,7 +208,6 @@ implementation
         j := collision[cur].j;
         //precise check (i, j) - determine if asteroids actually collided - remove collision if precise check fails
         if not PreciseCheck(asteroids[i], asteroids[j]) then begin
-          WriteLn('2.1.1');
           //remove from collisions
           Remove(collision, cur);
           //set i and j collision count array to -1
@@ -217,7 +218,7 @@ implementation
           cur += 1;
         end;
       end;
-      
+
       //loop collision count array
       for cur := 0 to High(collisionCount) do begin
         //if count > 1
@@ -238,10 +239,10 @@ implementation
           destroy[new] := cur;
         end;
       end;
-      
+
       new := Length(ignoreCollision);
       SetLength(ignoreCollision, Length(ignoreCollision) + Length(collision));
-      
+
       for cur := 0 to High(collision) do begin
         i := collision[cur].i;
         j := collision[cur].j;
@@ -263,7 +264,7 @@ implementation
         PlayAsteroidExplodeEffect(state);
         CreateSparks(debris,8,collisionPoint);
         DestroyAsteroid(asteroids, destroy[cur], collisionPoint, debris);
-        
+
         //loop through ignore collision array
         for del := 0 to High(ignoreCollision) do begin
           //if any number in array is higher than the asteroid being destroyed, shift down by 1
@@ -275,13 +276,13 @@ implementation
           end;
         end;
       end;
-      
+
       state.ignoreCollision := ignoreCollision;
 
       ///                 ///
       //ASTEROID COLLISIONS//
       ///                 ///
-      
+
       //asteroid collide asteroid
 
 {   try
@@ -300,28 +301,28 @@ implementation
               begin
                 last := asteroids[i].last; //keep it for later
                 DestroyTwoAsteroids(asteroids, i, last, FindCollisionPoint(asteroids[i].pos,asteroids[i].rad,asteroids[last].pos,asteroids[last].rad), debris);
-           
+
                 //I could explain what this does, or you could just nod, smile, and accept that this prevents access violations from occurring
                 if asteroids[asteroids[last].last].last = last then
                   asteroids[asteroids[last].last].last := -1;
-           
-           
+
+
                 if i > last then //move back one if the other one we removed was before i
                   i -= 1;
-                
+
                 //start the next loop of j
                 j := i;
               end
               //check asteroid[j] to make sure it won't instantly collide with it's last asteroid
-              else if (asteroids[j].last > -1) and (PointPointDistance(asteroids[j].pos, asteroids[asteroids[j].last].pos) <= (asteroids[j].rad + asteroids[asteroids[j].last].rad)) then 
+              else if (asteroids[j].last > -1) and (PointPointDistance(asteroids[j].pos, asteroids[asteroids[j].last].pos) <= (asteroids[j].rad + asteroids[asteroids[j].last].rad)) then
               begin
                 last := asteroids[j].last;
                 DestroyTwoAsteroids(asteroids, j, last, FindCollisionPoint(asteroids[j].pos,asteroids[j].rad,asteroids[last].pos,asteroids[last].rad), debris);
-           
+
                 //And again. Nod, smile, accept. Easy :)
                 if asteroids[asteroids[last].last].last = last then
                   asteroids[asteroids[last].last].last := -1;
-           
+
                 if i > last then //move back one if the other one we removed was before i
                   i -= 1;
                 if j > last then //move back one if the other one we removed was before j
@@ -427,7 +428,7 @@ implementation
         end;
         i += 1;
       end;
-      
+
       //bullet collide player, bullet collide enemy
       i := 0;
       while i < Length(bullets) do
@@ -497,7 +498,7 @@ implementation
 
       for i := 0 to High(asteroids) do
         MoveAsteroid(asteroids[i]);
-      
+
       i := 0;
       while i <= High(bullets) do
       begin
@@ -509,7 +510,7 @@ implementation
         end;
         i += 1;
       end;
-      
+
       i := 0;
       while i <= High(debris) do
       begin
@@ -521,7 +522,7 @@ implementation
         end;
         i += 1;
       end;
-      
+
       i := 0;
       while i <= High(notes) do
       begin
@@ -544,25 +545,25 @@ implementation
 
     for i := 0 to High(notes) do
       DrawNote(notes[i]);
-    
+
     if player.alive then
       DrawPlayer(player);
 
     if enemy.alive then
       DrawEnemy(enemy);
-      
+
     for i := 0 to High(asteroids) do
       DrawAsteroid(asteroids[i]);
-      
+
     for i := 0 to High(bullets) do
       DrawBullet(bullets[i]);
-    
+
     for i := 0 to High(debris) do
       DrawDebris(debris[i]);
-    
+
     if menu.visible then
       DrawMenu(menu,state);
-    
+
     DrawState(state);
   end;
 

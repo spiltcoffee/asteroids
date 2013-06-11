@@ -4,11 +4,11 @@ interface
   uses asTypes;
 
   function NeedMoreAsteroids(const score: Integer; const asteroids: TAsteroidArray): Boolean;
-  
+
   procedure SetupState(var state: TState);
-  
+
   procedure UpdateState(var state: TState; const player: TShip; var notes: TNoteArray);
-  
+
   procedure DrawState(const state: TState);
 
 implementation
@@ -18,7 +18,7 @@ implementation
   begin
 	result := Min(Trunc(score / (STATE_ASTEROID_SCORE_INTERVAL)) + ASTEROID_MINCOUNT, ASTEROID_MAXCOUNT);
   end;
-  
+
   function NeedMoreAsteroids(const score: Integer; const asteroids: TAsteroidArray): Boolean;
   begin
     result := Length(asteroids) < GetTargetAsteroidCount(score);
@@ -68,7 +68,7 @@ implementation
       state.enemylives += 1;
       state.enemynext += ENEMY_SPAWN_INTERVAL;
     end;
-    
+
     if state.time > 0 then
       state.time -= 1;
   end;
@@ -81,7 +81,7 @@ implementation
     if state.playing then
     begin
       smallFont := FontNamed('mediumFont');
-      DrawShape(PlayerShip(),state.pos.x,state.pos.y + 10,270,ColorWhite);
+      DrawShape(ShipPoints,state.pos.x,state.pos.y + 10,270,ColorWhite);
       DrawText('x '+IntToStr(state.lives),ColorWhite,smallFont,state.pos.x + 12,state.pos.y);
       DrawText(IntToStr(state.score),ColorWhite,smallFont,state.pos.x - 6,state.pos.y - 25);
     end;

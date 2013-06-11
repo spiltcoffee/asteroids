@@ -8,17 +8,17 @@ interface
   procedure LoadSubmitScoreMenu(var menu: TMenu; const state: TState);
   procedure LoadGameOverMenu(var menu: TMenu; const state: TState);
   procedure LoadHighScoresMenu(var menu: TMenu);
-  
+
   procedure SetupMenu(var menu: TMenu);
-  
+
   procedure StartMenuCommand(command: MenuCommand; var state: TState; var menu: TMenu);
-  
+
   procedure EndMenuCommand(var state: TState; var menu: TMenu; var player, enemy: TShip; var asteroids: TAsteroidArray; var bullets: TBulletArray; var debris: TDebrisArray; var notes: TNoteArray);
-  
+
   procedure MoveMenu(var menu: TMenu; var state: TState);
-  
+
   procedure DrawMenu(const menu: TMenu; const state: TState);
-  
+
 implementation
   uses sgCore, sgGraphics, sgInput, sgText, asAudio, asConstants, asDraw, asExtras, asHighScores, asMenuCommands, Sysutils;
 
@@ -40,7 +40,7 @@ implementation
       item[2].command := LoadScores;
       item[3].text := 'Quit Game';
       item[3].command := Quit;
-      
+
       for i := 0 to High(item) do with item[i] do
       begin
         pos.x := 400 - TextWidth(FontNamed('menuFont'),text) / 2;
@@ -70,7 +70,7 @@ implementation
       item[3].command := MVolume;
       item[4].text := 'Back to Main Menu';
       item[4].command := SaveOptions;
-      
+
       for i := 0 to High(item) do with item[i] do
       begin
         pos.x := 400 - TextWidth(FontNamed('menuFont'),text);
@@ -98,7 +98,7 @@ implementation
       item[1].command := GotoMain;
       item[2].text := 'Quit Game';
       item[2].command := Quit;
-      
+
       for i := 0 to High(item) do with item[i] do
       begin
         pos.x := 400 - TextWidth(FontNamed('menuFont'),text) / 2;
@@ -154,10 +154,10 @@ implementation
       item[2].command := GotoMain;
       item[3].text := 'Quit Game';
       item[3].command := Quit;
-      
+
       if not NewHighScore(state.score) or not state.submitscore then
         Remove(item,0);
-      
+
       for i := 0 to High(item) do with item[i] do
       begin
         pos.x := 400 - TextWidth(FontNamed('menuFont'),text) / 2;
@@ -187,7 +187,7 @@ implementation
         pos.y := 300 - ((MENU_ITEM_PADDING * High(item)) div 2) + (MENU_ITEM_PADDING * i);
         kind := Nothing;
       end;
-      
+
       item[5].text := 'Back to Main Menu';
       item[5].pos.x := 400 - TextWidth(FontNamed('menuFont'),item[5].text) / 2;
       item[5].pos.y := 300 - ((MENU_ITEM_PADDING * High(item)) div 2) + (MENU_ITEM_PADDING * 5);
@@ -374,7 +374,7 @@ implementation
   begin
     case option of
       Fullscreen: begin
-        if state.fullscreen then 
+        if state.fullscreen then
           result := 'Yes'
         else
           result := 'No';
@@ -394,7 +394,7 @@ implementation
     DrawText(menu.title,ColorGreen,FontNamed('titleFont'),menu.pos.x + 400 - TextWidth(FontNamed('titleFont'),menu.title) / 2,menu.pos.y + 75);
     DrawText(menu.subtitle,ColorGreen,FontNamed('subtitleFont'),menu.pos.x + 400 - TextWidth(FontNamed('subtitleFont'),menu.subtitle) / 2,menu.pos.y + 135);
     DrawText('Final Release',ColorGreen,FontNamed('menuFont'),ScreenWidth() - TextWidth(FontNamed('menuFont'),'Final Release') - 10,ScreenHeight() - MENU_ITEM_HEIGHT - 10);
-    
+
     menuFont := FontNamed('menuFont');
     for i := 0 to High(menu.item) do with menu.item[i] do
     begin
@@ -402,7 +402,7 @@ implementation
       if (kind = Option) or ((kind = Input) and not state.readingtext) then
         DrawText(GetMenuOption(command,state),ColorGreen,menuFont,menu.pos.x + 400,menu.pos.y + pos.y - MENU_ITEM_HEIGHT / 2);
       if menu.selected = i then
-        DrawShape(PlayerShip(),menu.pos.x + pos.x - MENU_ITEM_SELECT_OFFSET, menu.pos.y + pos.y,0,colorGreen);
+        DrawShape(ShipPoints,menu.pos.x + pos.x - MENU_ITEM_SELECT_OFFSET, menu.pos.y + pos.y,0,colorGreen);
     end;
   end;
 

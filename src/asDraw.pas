@@ -3,10 +3,10 @@ unit asDraw;
 interface
   uses sgTypes, asTypes;
   procedure LoadFonts();
-  
+
   function PointerTriangle(): Point2DArray;
 
-  function PlayerShip(firstOnly: Boolean = false): Point2DArray;
+  function ShipPoints(firstOnly: Boolean = false): Point2DArray;
 
   function CopyRotateTranslate(arrayOfPoints: Point2DArray; pos: Point2D; rot: Double): Point2DArray;
 
@@ -40,7 +40,7 @@ implementation
     result[2].y := 8;
   end;
 
-  function PlayerShip(firstOnly: Boolean = false): Point2DArray;
+  function ShipPoints(firstOnly: Boolean = false): Point2DArray;
   begin
     if firstOnly then
     begin
@@ -70,10 +70,10 @@ implementation
     translation, rotation: Matrix2D;
   begin
     result := Copy(arrayOfPoints,0,Length(arrayOfPoints)); //so we don't modify the original array of points
-    
+
     translation := TranslationMatrix(pos);
     rotation := RotationMatrix(rot);
-    
+
     for i := 0 to High(result) do
     begin
       result[i] := MatrixMultiply(translation,MatrixMultiply(rotation,result[i])); //rotate, then translate

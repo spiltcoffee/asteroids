@@ -75,7 +75,7 @@ implementation
     closestDist: Double;
   begin
     closestDist := PointPointDistance(fromPoint,toPoint);
-   
+
     if (fromPoint.x > toPoint.x) then
       toPoint.x += (ScreenWidth() + BUFFER * 2)
     else if (fromPoint.x < toPoint.x) then
@@ -83,23 +83,23 @@ implementation
 
     if PointPointDistance(fromPoint,toPoint) < closestDist then
       closestDist := PointPointDistance(fromPoint,toPoint);
-    
+
     if (fromPoint.y > toPoint.y) then
       toPoint.y += (ScreenHeight() + BUFFER * 2)
     else if (fromPoint.y < toPoint.y) then
       fromPoint.y += (ScreenHeight() + BUFFER * 2);
-    
+
     if PointPointDistance(fromPoint,toPoint) < closestDist then
       closestDist := PointPointDistance(fromPoint,toPoint);
-    
+
     if (fromPoint.x > toPoint.x) then
       fromPoint.x -= (ScreenWidth() + BUFFER * 2)
     else if (fromPoint.x < toPoint.x) then
       toPoint.x -= (ScreenWidth() + BUFFER * 2);
-      
+
     if PointPointDistance(fromPoint,toPoint) < closestDist then
       closestDist := PointPointDistance(fromPoint,toPoint);
-    
+
     result := closestDist;
   end;
 
@@ -109,7 +109,7 @@ implementation
   begin
     closestDist := PointPointDistance(fromPoint,toPoint);
     bestAngle := CalculateAngleBetween(fromPoint,toPoint);
-   
+
     if (fromPoint.x > toPoint.x) then
       toPoint.x += (ScreenWidth() + BUFFER * 2)
     else if (fromPoint.x < toPoint.x) then
@@ -120,26 +120,26 @@ implementation
       closestDist := PointPointDistance(fromPoint,toPoint);
       bestAngle := CalculateAngleBetween(fromPoint,toPoint);
     end;
-    
+
     if (fromPoint.y > toPoint.y) then
       toPoint.y += (ScreenHeight() + BUFFER * 2)
     else if (fromPoint.y < toPoint.y) then
       fromPoint.y += (ScreenHeight() + BUFFER * 2);
-    
+
     if PointPointDistance(fromPoint,toPoint) < closestDist then
     begin
       closestDist := PointPointDistance(fromPoint,toPoint);
       bestAngle := CalculateAngleBetween(fromPoint,toPoint);
     end;
-    
+
     if (fromPoint.x > toPoint.x) then
       fromPoint.x -= (ScreenWidth() + BUFFER * 2)
     else if (fromPoint.x < toPoint.x) then
       toPoint.x -= (ScreenWidth() + BUFFER * 2);
-      
+
     if PointPointDistance(fromPoint,toPoint) < closestDist then
       bestAngle := CalculateAngleBetween(fromPoint,toPoint);
-    
+
     result := bestAngle;
   end;
 
@@ -214,7 +214,7 @@ implementation
       result.y := PLAYER_INDICATOR_BUFFER;
       count -= 1;
     end;
-    
+
     side *= count;
   end;
 

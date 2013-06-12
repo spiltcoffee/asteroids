@@ -1,25 +1,26 @@
-unit asPlayer;
+unit asShip;
 
 interface
-  uses asTypes;
+  uses sgTypes, asTypes;
 
-  procedure CreatePlayer(var player: TShip);
+  procedure CreateShip(var player: TShip);
 
-  procedure ResetPlayer(var player: TShip; var state: TState);
+  procedure ResetShip(var player: TShip; var state: TState);
 
-  procedure SpawnPlayer(var player: TShip; var state: TState);
+  procedure SpawnShip(var player: TShip; var state: TState);
 
-  procedure KillPlayer(var player: TShip; var state: TState; var debris: TDebrisArray; var notes: TNoteArray);
+  procedure KillShip(var player: TShip; var state: TState; var debris: TDebrisArray; var notes: TNoteArray);
 
-  procedure MovePlayer(var player: TShip; const state: TState);
+  procedure MoveShip(var ship: TShip; const state: TState; const asteroids: TAsteroidArray);
 
-  procedure DrawPlayer(const player: TShip);
+  procedure DrawShip(const player: TShip);
 
 implementation
-  uses sgCore, sgGeometry, sgInput, sgTypes, asAudio, asConstants, asDraw, asEffects, asNotes, asOffscreen;
-  procedure CreatePlayer(var player: TShip);
+  uses sgCore, sgGeometry, sgInput, asAudio, asConstants, asDraw, sgGraphics, asEffects, asNotes, asOffscreen, asShipController;
+
+  procedure CreateShip(var player: TShip);
   begin
-    player.kind := SK_PLAYER;
+    player.kind := SK_SHIP_AI;
 
     player.rad := 9;
 
@@ -37,9 +38,10 @@ implementation
     player.respawn := 0;
     player.int := 0;
     player.thrust := false;
+    player.controller.steer_state := ssAlign;
   end;
 
-  procedure ResetPlayer(var player: TShip; var state: TState);
+  procedure ResetShip(var player: TShip; var state: TState);
   begin
     player.pos.x := ScreenWidth() / 2;
     player.pos.y := ScreenHeight() / 2;
@@ -53,19 +55,19 @@ implementation
     player.alive := true;
     player.shields := PLAYER_SHIELD_HIGH;
     player.int := 0;
-    player.thrust := false;
+    player.thrust := False;
 
     state.lives -= 1;
   end;
 
-  procedure SpawnPlayer(var player: TShip; var state: TState);
+  procedure SpawnShip(var player: TShip; var state: TState);
   begin
-    ResetPlayer(player,state);
+    ResetShip(player,state);
     player.respawn := PLAYER_RESPAWN_SHOW;
     state.lives += 1;
   end;
 
-  procedure KillPlayer(var player: TShip; var state: TState; var debris: TDebrisArray; var notes: TNoteArray);
+  procedure KillShip(var player: TShip; var state: TState; var debris: TDebrisArray; var notes: TNoteArray);
   begin
     CreateDebris(player,debris);
     player.alive := false;
@@ -77,41 +79,49 @@ implementation
     end;
   end;
 
-  procedure MovePlayer(var player: TShip; const state: TState);
+  procedure MoveShip(var ship: TShip; const state: TState; const asteroids: TAsteroidArray);
+  var
+    thrust: Boolean;
+    rotation: Double;
   begin
-    if KeyDown(VK_LEFT) and not KeyDown(VK_RIGHT) then
-      player.rot -= PLAYER_ROTATION_SPEED
-    else if KeyDown(VK_RIGHT) and not KeyDown(VK_LEFT) then
-      player.rot += PLAYER_ROTATION_SPEED;
-
-    if player.rot < 0 then
-      player.rot += 360
-    else if player.rot > 360 then
-      player.rot -= 360;
-
-    if KeyDown(VK_UP) then
-    begin
-      StartThrusterEffect(state);
-      player.vel += VectorFromAngle(player.rot,PLAYER_ACCELERATION);
-      player.thrust := not player.thrust;
-    end
+    thrust := False;
+    rotation := 0;
+    if ship.kind = SK_SHIP_PLAYER then
+      MovePlayer(ship, state, thrust, rotation)
     else
+      MoveAI(ship, state, asteroids, thrust, rotation);
+
+    ship.rot += rotation * PLAYER_ROTATION_SPEED;
+
+    if ship.rot < 0 then
+      ship.rot += 360
+    else if ship.rot > 360 then
+      ship.rot -= 360;
+
+    if thrust = True then begin
+      StartThrusterEffect(state);
+      ship.vel += VectorFromAngle(ship.rot,PLAYER_ACCELERATION);
+      ship.thrust := not ship.thrust;
+    end
+    else begin
       EndThrusterEffect();
+      ship.thrust := False;
+    end;
 
-    if sqrt(sqr(player.vel.x) + sqr(player.vel.y)) < MAX_SPEED then
-      player.vel := LimitVector(player.vel,MAX_SPEED);
+    if sqrt(sqr(ship.vel.x) + sqr(ship.vel.y)) < MAX_SPEED then
+      ship.vel := LimitVector(ship.vel,MAX_SPEED);
 
-    player.pos += player.vel;
-    WrapPosition(player.pos);
+    ship.pos += ship.vel;
+    WrapPosition(ship.pos);
 
-    if (player.shields < PLAYER_SHIELD_HIGH) then
-      player.shields += 1;
+    if (ship.shields < PLAYER_SHIELD_HIGH) then
+      ship.shields += 1;
 
-    if player.int > 0 then
-      player.int -= 1;
+    if ship.int > 0 then
+      ship.int -= 1;
   end;
 
-  procedure DrawPlayer(const player: TShip);
+  procedure DrawShip(const player: TShip);
   var
     thrusterPoints: Point2DArray;
     shipColor, thrustColor: Color;
@@ -128,7 +138,7 @@ implementation
 
     DrawShape(ShipPoints,player.pos,player.rot,shipColor);
 
-    if KeyDown(VK_UP) and player.thrust then
+    if player.thrust then
     begin
       thrusterPoints := Copy(ShipPoints,1,3);
       thrusterPoints[1].x -= PLAYER_THRUST_AMPLITUDE;

@@ -18,7 +18,7 @@ interface
 implementation
   uses sgCamera, sgCore, sgGeometry, sgGraphics, sgInput, sgTypes, asAsteroids, asAudio,
        asCollisions, asConstants, asDraw, asEnemy, asEffects, asExtras, asMenu, asNotes,
-       asPlayer, asState
+       asShip, asState
 
        {REMOVE}, SysUtils;
 
@@ -65,7 +65,7 @@ implementation
 
     SetupMenu(menu);
 
-    CreatePlayer(player);
+    CreateShip(player);
 
     SetupEnemy(enemy);
 
@@ -91,7 +91,7 @@ implementation
         if (state.lives > 0) and (player.respawn < PLAYER_RESPAWN_SHOW) then
         begin
           PlayRespawnEffect(state);
-          ResetPlayer(player,state);
+          ResetShip(player,state);
         end
         else if (state.lives = 0) and (player.respawn = 0) then
         begin
@@ -142,7 +142,7 @@ implementation
         begin
           PlayShipExplodeEffect(state);
           CreateSparks(debris,4,FindCollisionPoint(player.pos,player.rad,enemy.pos,ENEMY_RADIUS_OUT));
-          KillPlayer(player,state,debris,notes);
+          KillShip(player,state,debris,notes);
         end
         else if (player.respawn = 0) then
           PlayAlarmEffect(state);
@@ -375,7 +375,7 @@ implementation
             begin
               PlayShipExplodeEffect(state);
               CreateSparks(debris,4,FindCollisionPoint(asteroids[i].pos,asteroids[i].rad,player.pos,player.rad));
-              KillPlayer(player,state,debris,notes);
+              KillShip(player,state,debris,notes);
             end
             else if (player.respawn = 0) then
               PlayAlarmEffect(state);
@@ -414,7 +414,7 @@ implementation
           if (PointPointDistance(asteroids[i].pos, bullets[j].pos) <= (asteroids[i].rad + BULLET_RADIUS)) and (bullets[j].life > 0) then
           begin
             PlayAsteroidExplodeEffect(state);
-            if bullets[j].kind = SK_PLAYER then
+            if bullets[j].kind = SK_SHIP_PLAYER then
               DestroyAsteroid(asteroids,i,bullets[j].pos,state,debris,notes)
             else
               DestroyAsteroid(asteroids,i,bullets[j].pos,debris);
@@ -433,7 +433,7 @@ implementation
       i := 0;
       while i < Length(bullets) do
       begin
-        if player.alive and (PointPointDistance(player.pos, bullets[i].pos) <= (player.rad + BULLET_RADIUS)) and (bullets[i].life > 0) and (bullets[i].kind = SK_ENEMY) then
+        if player.alive and (PointPointDistance(player.pos, bullets[i].pos) <= (player.rad + BULLET_RADIUS)) and (bullets[i].life > 0) and (bullets[i].kind <> SK_SHIP_PLAYER) then
         begin
           PlayCollisionEffect(state);
           if (player.respawn = 0) then
@@ -441,7 +441,7 @@ implementation
           if (player.shields < 0) then
           begin
             PlayShipExplodeEffect(state);
-            KillPlayer(player,state,debris,notes);
+            KillShip(player,state,debris,notes);
           end
           else if (player.respawn = 0) then
             PlayAlarmEffect(state);
@@ -450,7 +450,7 @@ implementation
           ShakeScreen();
           i -= 1;
         end
-        else if enemy.alive and (PointPointDistance(enemy.pos, bullets[i].pos) <= (ENEMY_RADIUS_OUT + BULLET_RADIUS)) and (bullets[i].life > 0) and (bullets[i].kind = SK_PLAYER) then
+        else if enemy.alive and (PointPointDistance(enemy.pos, bullets[i].pos) <= (ENEMY_RADIUS_OUT + BULLET_RADIUS)) and (bullets[i].life > 0) and (bullets[i].kind = SK_SHIP_PLAYER) then
         begin
           if (enemy.respawn = 0) then
             enemy.shields -= Trunc(ENEMY_SHIELD_HIGH*0.99);
@@ -491,7 +491,7 @@ implementation
     if not state.paused then
     begin
       if player.alive then
-        MovePlayer(player,state);
+        MoveShip(player,state,asteroids);
 
       if enemy.alive then
         MoveEnemy(enemy,state,player,asteroids);
@@ -547,7 +547,7 @@ implementation
       DrawNote(notes[i]);
 
     if player.alive then
-      DrawPlayer(player);
+      DrawShip(player);
 
     if enemy.alive then
       DrawEnemy(enemy);

@@ -19,13 +19,13 @@ implementation
 
   procedure SetupEnemy(var enemy: TShip);
   begin
-    enemy.kind := SK_ENEMY;
+    enemy.kind := SK_UFO_AI;
     enemy.rad := ENEMY_RADIUS_OUT;
     enemy.last := -1;
     enemy.alive := false;
     enemy.int := 0;
     enemy.shields := ENEMY_SHIELD_HIGH;
-    
+
     //unused stuff
     SetLength(enemy.point,0);
     enemy.rot := 0;
@@ -78,7 +78,7 @@ implementation
         closestDist := curDist;
       end;
     end;
-    
+
     if closestDist < (enemy.rad + ENEMY_ASTEROIDDANGERDIST + asteroids[closest].rad) then
       enemy.vel += VectorFromAngle(CalculateAngleWithWrap(asteroids[closest].pos,enemy.pos),ENEMY_ACCELERATION)
     else if player.alive then
@@ -89,10 +89,10 @@ implementation
         enemy.vel -= VectorFromAngle(CalculateAngleWithWrap(enemy.pos,player.pos),ENEMY_ACCELERATION);
     end;
     enemy.vel := LimitVector(enemy.vel,ENEMY_MAXSPEED);
-    
+
     enemy.pos += enemy.vel;
     WrapPosition(enemy.pos);
-    
+
     if (enemy.shields < ENEMY_SHIELD_HIGH) then
       enemy.shields += 1;
 
@@ -110,7 +110,7 @@ implementation
 
     DrawCircle(shipColor,false,enemy.pos,Trunc(enemy.rad));
     DrawCircle(shipColor,false,enemy.pos,ENEMY_RADIUS_IN);
-    
+
     if (enemy.pos.x < 0) or (enemy.pos.x > ScreenWidth()) or (enemy.pos.y < 0) or (enemy.pos.y > ScreenHeight()) then
       DrawPointer(enemy,shipColor);
   end;

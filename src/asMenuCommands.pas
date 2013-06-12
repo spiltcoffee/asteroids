@@ -7,17 +7,17 @@ interface
   uses asTypes;
 
   procedure StartGame(var state: TState; var menu: TMenu; var player, enemy: TShip; var asteroids: TAsteroidArray; var bullets: TBulletArray; var debris: TDebrisArray; var notes: TNoteArray); overload;
-  
+
   procedure EndGame(var state: TState; var menu: TMenu; var player, enemy: TShip; var asteroids: TAsteroidArray; var bullets: TBulletArray; var debris: TDebrisArray; var notes: TNoteArray); overload;
-  
+
   function ApplyGameOptions(const state: TState): Boolean;
-  
+
   procedure SaveGameOptions(const state: TState);
-  
+
   procedure LoadGameOptions(var state: TState);
 
 implementation
-  uses sgCore, sgGraphics, asConstants, asAsteroids, asEnemy, asMenu, asPlayer, asState, Sysutils;
+  uses sgCore, sgGraphics, asConstants, asAsteroids, asEnemy, asMenu, asShip, asState, Sysutils;
 
   procedure StartGame(var state: TState; var menu: TMenu; var player, enemy: TShip; var asteroids: TAsteroidArray; var bullets: TBulletArray; var debris: TDebrisArray; var notes: TNoteArray); overload;
   begin
@@ -26,22 +26,22 @@ implementation
     state.transition := FadeIn;
     state.time := STATE_FADE_TIME;
     state.perform := NoCommand;
-    
+
     menu.visible := false;
     menu.disabled := false;
     menu.selected := 0;
     LoadPauseMenu(menu);
 
-    CreatePlayer(player);
-    SpawnPlayer(player,state);
-    
+    CreateShip(player);
+    SpawnShip(player,state);
+
     SetupEnemy(enemy);
-    
+
     SetLength(asteroids,0);
-    
+
     while NeedMoreAsteroids(state.score, asteroids) do
       CreateAsteroid(asteroids,player);
-    
+
     SetLength(bullets,0);
     SetLength(debris,0);
     SetLength(notes,0);
@@ -54,22 +54,22 @@ implementation
     state.transition := FadeIn;
     state.time := STATE_FADE_TIME;
     state.perform := NoCommand;
-    
+
     SetupMenu(menu);
     menu.visible := true;
     menu.disabled := false;
     menu.selected := 0;
     LoadMainMenu(menu);
 
-    CreatePlayer(player);
-    
+    CreateShip(player);
+
     SetupEnemy(enemy);
-    
+
     SetLength(asteroids,0);
-    
+
     while NeedMoreAsteroids(state.score, asteroids) do
       CreateAsteroid(asteroids,player);
-    
+
     SetLength(bullets,0);
     SetLength(debris,0);
     SetLength(notes,0);

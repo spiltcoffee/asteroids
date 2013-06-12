@@ -2,18 +2,18 @@ unit asCollisions;
 
 interface
   uses sgTypes, asTypes;
-  
+
   function PreviouslyCollided(ignoreCollision: TCollisionArray; i, j: Integer): Boolean;
-  
+
   function ImpreciseCheck(var asteroid1: TAsteroid; var asteroid2: TAsteroid): Boolean;
   function PreciseCheck(var asteroid1: TAsteroid; var asteroid2: TAsteroid): Boolean;
-  
+
   procedure ShakeScreen();
-  
+
   procedure Collide(var asteroid1: TAsteroid; var asteroid2: TAsteroid); overload;
   procedure Collide(var asteroid: TAsteroid; var ship: TShip); overload;
   procedure Collide(var ship1, ship2: TShip); overload;
-  
+
   function FindCollisionPoint(const center1: Point2D; const radius1: Double; const center2: Point2D; const radius2: Double): Point2D;
 
 implementation
@@ -33,12 +33,12 @@ implementation
       end;
     end;
   end;
-  
+
   function ImpreciseCheck(var asteroid1: TAsteroid; var asteroid2: TAsteroid): Boolean;
   begin
     result := PointPointDistance(asteroid1.pos, asteroid2.pos) <= (asteroid1.rad + asteroid2.rad);
   end;
-  
+
   function PreciseCheck(var asteroid1: TAsteroid; var asteroid2: TAsteroid): Boolean;
   var
     i, j: Integer;
@@ -55,7 +55,7 @@ implementation
       end;
     end;
   end;
-  
+
   procedure ShakeScreen();
   begin
     SetCameraX(SHAKE_FACTOR + Rnd(3) - 1);
@@ -76,7 +76,7 @@ implementation
     result.pos := ship.pos;
     result.vel := ship.vel;
     result.rotspeed := 0;
-    if ship.kind = SK_PLAYER then
+    if ship.kind <> SK_UFO_AI then
       result.mass := PLAYER_MASS
     else
       result.mass := ENEMY_MASS;
@@ -122,7 +122,7 @@ implementation
     else if object2.rotspeed > 180 then
       object2.rotspeed -= 360;
     object2.rotspeed /= (360000);
-    
+
     object1.damage := Trunc(VectorMagnitude(object2.vel - object1.vel) * (object2.mass / (object1.mass + object2.mass)) * COLLISION_MODIFIER);
     object2.damage := Trunc(VectorMagnitude(object1.vel - object2.vel) * (object1.mass / (object1.mass + object2.mass)) * COLLISION_MODIFIER);
 
@@ -159,11 +159,11 @@ implementation
     asteroid.rot.speed -= object1.rotspeed;
 
     if ship.respawn = 0 then
-      ship.shields -= object2.damage;  
+      ship.shields -= object2.damage;
     if ship.shields > 0 then
       ship.vel := object2.vel;
-      
-    if ship.kind = SK_PLAYER then
+
+    if ship.kind = SK_SHIP_PLAYER then
       ShakeScreen();
   end;
 
@@ -175,7 +175,7 @@ implementation
     object2 := GetCollisionObject(ship2);
 
     CalculateCollision(object1,object2);
-    
+
     if ship1.respawn = 0 then
       ship1.shields -= object1.damage;
     if ship1.shields > 0 then
@@ -185,7 +185,7 @@ implementation
       ship2.shields -= object2.damage;
     if ship2.shields > 0 then
       ship2.vel := object2.vel;
-    
+
     if ship1.kind <> ship2.kind then
       ShakeScreen();
   end;
@@ -196,7 +196,7 @@ implementation
       result.x := center1.x + (center2.x - center1.x) / (radius1 + radius2) * radius1
     else
       result.x := center2.x + (center1.x - center2.x) / (radius1 + radius2) * radius2;
-    
+
     if center1.y < center2.y then
       result.y := center1.y + (center2.y - center1.y) / (radius1 + radius2) * radius1
     else

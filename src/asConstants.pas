@@ -5,14 +5,14 @@ interface
     MAX_SPEED = 50; //this game's speed of light! :D (except bullets can still go faster... :S)
     MAX_ROTATION = 24;
     BUFFER = 50;
-	  FRAMES_PER_SECOND = 30;
+    FRAMES_PER_SECOND = 30;
 
     SHAKE_FACTOR = 6; //+- 1 around this value will be used
     COLLISION_MODIFIER = 40;
 
     STATE_PLAYERMOVEDIST = 200; //pixels from player until score and lives will be moved
     STATE_FADE_TIME = 30;
-	  STATE_ASTEROID_SCORE_INTERVAL = 750;
+    STATE_ASTEROID_SCORE_INTERVAL = 750;
 
     MENU_ITEM_PADDING = 30;
     MENU_ITEM_HEIGHT = 22;
@@ -29,11 +29,11 @@ interface
     PLAYER_RESPAWN_HIGH = 250;
     PLAYER_RESPAWN_SHOW = 190;
     PLAYER_RESPAWN_FLASH = 10;
-	  PLAYER_ROTATION_SPEED = 6;
-    PLAYER_SHIELD_HIGH = 200;
+    PLAYER_ROTATION_SPEED = 6;
+    PLAYER_SHIELD_HIGH = 200000;
     PLAYER_SHIELD_FLASH = 20;
     PLAYER_BULLET_INTERVAL = 10;
-    
+
     AI_DANGER_CLOSE = 15;
 
     ENEMY_SPAWN_INTERVAL = 20000;
@@ -54,7 +54,7 @@ interface
     ASTEROID_MAXCOUNT = 200; //maximum amount of asteroids that we can spawn
     ASTEROID_MAXPOINTS = 10;
     ASTEROID_MINPOINTS = 6;
-    ASTEROID_DENSITY = 10; 
+    ASTEROID_DENSITY = 10;
     ASTEROID_MAXSIZE = 50;
     ASTEROID_MINSIZE = 10;
     ASTEROID_MAXROTATION = 5;
@@ -78,5 +78,5 @@ interface
     DEBRIS_MAXROTATION = 15;
 
 implementation
-    
+
 end.

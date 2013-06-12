@@ -30,7 +30,7 @@ interface
       MVolume,
       Quit
     );
-    
+
     MenuItemKind = (
       Nothing,
       Select,
@@ -43,7 +43,7 @@ interface
       j: Integer;
     end;
     TCollisionArray = array of TCollision;
-    
+
     TState = record
       playing: Boolean;
       paused: Boolean;
@@ -74,7 +74,7 @@ interface
       pos: Point2D;
     end;
     TMenuItemArray = array of TMenuItem;
-    
+
     TMenu = record
       title: String;
       subtitle: String;
@@ -84,22 +84,44 @@ interface
       disabled: Boolean;
       pos: Point2D;
     end;
-    
+
     THighScore = record
       name: String;
       score: Integer;
     end;
     THighScoreArray = array of THighScore;
-    
+
     Rotation = record
       speed: Double;
       angle: Double;
     end;
 
     ShipKind = (
-      SK_PLAYER,
-      SK_ENEMY
-    );  
+      SK_SHIP_PLAYER,
+      SK_SHIP_AI,
+      SK_UFO_AI
+    );
+
+    TSteerState = (
+      ssSeek,
+      ssCorrect,
+      ssStop,
+      ssAlign
+    );
+
+const
+C_SteerStateStrings: array[TSteerState] of string = (
+      'align',
+      'seek',
+      'correct',
+      'stop'
+      );
+type
+
+    TController = record
+      steer_state: TSteerState;
+    end;
+
     TShip = record
       kind: ShipKind;
       point: Point2DArray;
@@ -113,6 +135,7 @@ interface
       respawn: Integer;
       int: Integer; //interval (for bullet)
       thrust: Boolean;
+      controller: TController;
     end;
 
     TAsteroid = record
@@ -130,7 +153,7 @@ interface
       pos: Point2D;
       vel: Vector;
       life: Integer;
-      kind: ShipKind; 
+      kind: ShipKind;
     end;
     TBulletArray = array of TBullet;
 
@@ -140,7 +163,7 @@ interface
       Circle
     );
     TDebris = record
-      kind: DebrisKind; 
+      kind: DebrisKind;
       point: Point2DArray;
       pos: Point2D;
       rot: Rotation;
@@ -149,7 +172,7 @@ interface
       col: Color;
     end;
     TDebrisArray = array of TDebris;
-    
+
     TNote = record
       text: String;
       pos: Point2D;
@@ -158,7 +181,7 @@ interface
       col: Color;
     end;
     TNoteArray = array of TNote;
-    
+
     CollisionObject = record
       pos: Point2D;
       vel: Vector;
@@ -168,5 +191,5 @@ interface
     end;
 
 implementation
-    
+
 end.

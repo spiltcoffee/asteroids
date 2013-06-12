@@ -27,7 +27,7 @@ implementation
     angle: Double;
     point: Point2DArray;
   begin
-    if shooter.kind = SK_PLAYER then
+    if shooter.kind <> SK_UFO_AI then
     begin
       SetLength(bullets,Length(bullets) + 1);
       new := High(bullets);
@@ -37,10 +37,10 @@ implementation
       bullets[new].pos := point[0]; //rotate, then translate
       bullets[new].vel := shooter.vel + VectorFromAngle(shooter.rot,BULLET_SPEED);
       bullets[new].life := BULLET_START;
-      bullets[new].kind := SK_PLAYER;
+      bullets[new].kind := shooter.kind;
       result := true;
     end
-    else if shooter.kind = SK_ENEMY then
+    else if shooter.kind = SK_UFO_AI then
     begin
       result := false;
       time := BULLET_START;
@@ -59,7 +59,7 @@ implementation
         bullets[new].pos := shooter.pos + VectorFromAngle(angle,shooter.rad);
         bullets[new].vel := shooter.vel + VectorFromAngle(angle,BULLET_SPEED);
         bullets[new].life := BULLET_START;
-        bullets[new].kind := SK_ENEMY;
+        bullets[new].kind := shooter.kind;
         result := true;
       end;
     end;
@@ -128,7 +128,7 @@ implementation
     nextPoint: Point2D;
     drawingPoints: Point2DArray;
   begin
-    if ship.kind = SK_PLAYER then
+    if ship.kind <> SK_UFO_AI then
     begin
       drawingPoints := CopyRotateTranslate(ShipPoints,ship.pos,ship.rot); //so we don't modify the original array of points
 
@@ -158,7 +158,7 @@ implementation
         debris[new].col := ColorGreen;
       end;
     end
-    else if ship.kind = SK_ENEMY then
+    else if ship.kind = SK_UFO_AI then
     begin
       for i := 1 to 2 do
       begin

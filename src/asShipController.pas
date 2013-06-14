@@ -3,17 +3,16 @@ unit asShipController;
 interface
   uses sgTypes, asTypes;
 
-  procedure MovePlayer(var player: TShip; const state: TState; var thrust: Boolean; var rotation: Double);
+  procedure MovePlayer(var player: TShip; const state: TState; var rotation: Double; var thrust: Boolean);
 
-  procedure MoveAI(var ship: TShip; const state: TState; const asteroids: TAsteroidArray; var thrust: Boolean; var rotation: Double);
+  procedure ShipAI(var ship: TShip; var rotation: Double; var thrust: Boolean);
+  procedure AIMove(var ship: TShip; const target: Point2D; var rotation: Double; var thrust: Boolean);
 
   procedure AIAlign(const ship: TShip; const target: Point2D; var rotation: Double);
   procedure AISeek(const ship: TShip; const target: Point2D; var rotation: Double; var thrust: Boolean);
-  {procedure AICorrect(const ship: TShip; const target: Point2D; var rotation: Double; var thrust: Boolean);}
   procedure AIStop(const ship: TShip; var rotation: Double; var thrust: Boolean);
-
   //checks if the ship would need to start turning and stopping right now in order to successfully stop on something or avoid something
-  function AITimeToStop(const ship: TShip): Boolean;
+  function AIDistToStop(const ship: TShip): Double;
 
   function CalcAccuracy(const ship_rot: Double; const source_pos, target_pos: Vector): Double; overload;
   function CalcAccuracy(const ship_vector: Vector; const source_pos, target_pos: Vector): Double; overload;
@@ -22,7 +21,7 @@ implementation
   uses sgCore, sgGeometry, sgInput, asAudio, asConstants, asDraw, sgGraphics, asEffects, asNotes, asOffscreen,
   sysutils, asPath;
 
-  procedure MovePlayer(var player: TShip; const state: TState; var thrust: Boolean; var rotation: Double);
+  procedure MovePlayer(var player: TShip; const state: TState; var rotation: Double; var thrust: Boolean);
   begin
     rotation := 0;
     if KeyDown(VK_LEFT) and not KeyDown(VK_RIGHT) then
@@ -35,18 +34,52 @@ implementation
       thrust := True;
   end;
 
-  procedure MoveAI(var ship: TShip; const state: TState; const asteroids: TAsteroidArray; var thrust: Boolean; var rotation: Double);
+  procedure ShipAI(var ship: TShip; var rotation: Double; var thrust: Boolean);
+  var
+    target: Point2D;
+    cur_state: TShipState;
+    distance: Double;
+    dist_to_stop: Double;
+    speed: Double;
+  begin
+    target := CurrentPoint(ship.path);
+    distance := PointPointDistance(ship.pos, target);
+    dist_to_stop := AIDistToStop(ship);
+    speed := VectorMagnitude(ship.vel);
+
+    cur_state := ship.controller.state;
+
+    //transitions!
+    case cur_state of
+      ssMove: begin
+        if (speed > 0) and (dist_to_stop > distance) then begin
+          cur_state := ssArrive;
+        end;
+      end;
+      ssArrive: begin
+        if dist_to_stop < distance then begin
+          cur_state := ssMove;
+        end;
+      end;
+    end;
+
+    //actions!
+    case cur_state of
+      ssMove: begin
+        AIMove(ship, target, rotation, thrust)
+      end;
+      ssArrive: begin
+        AIStop(ship, rotation, thrust);
+      end;
+    end;
+  end;
+
+  procedure AIMove(var ship: TShip; const target: Point2D; var rotation: Double; var thrust: Boolean);
   var
     speed: Double;
     facing_accuracy, vel_accuracy: Double;
-    target: Point2D;
-    old_state: TSteerState;
-    cur_state: TSteerState;
+    cur_state: TMoveState;
   begin
-    //WriteLn('con 1');
-    target := CurrentPoint(ship.path);
-    //WriteLn('con 2');
-
     //magnitude of velocity gives speed
     speed := VectorMagnitude(ship.vel);
 
@@ -55,54 +88,42 @@ implementation
     facing_accuracy := CalcAccuracy(ship.rot, ship.pos, target);
 
     //state machine time!
-    cur_state := ship.controller.steer_state;
-    old_state := cur_state;
+    cur_state := ship.controller.move_state;
 
     //then statemachine it
     //transitions
     case cur_state of
-      ssAlign: begin
+      smAlign: begin
         if facing_accuracy > 0.8 then
-          cur_state := ssSeek
-        else if speed < 1 then
-          cur_state := ssStop;
+          cur_state := smSeek
+        else if speed > 1 then
+          cur_state := smStop;
       end;
-      ssSeek: begin
+      smSeek: begin
         if (vel_accuracy < 0.8) then
-          cur_state := ssStop;
+          cur_state := smStop;
       end;
-      {ssCorrect: begin
-        if vel_accuracy < 0.5 then
-          cur_state := ssStop
-        else if vel_accuracy > 0.8 then
-          cur_state := ssSeek;
-      end;}
-      ssStop: begin
+
+      smStop: begin
         if speed < 1 then
-          cur_state := ssAlign;
+          cur_state := smAlign;
       end;
     end;
 
-    //if cur_state <> old_state then
-    //  WriteLn('state changed: ' + C_SteerStateStrings[old_state] + ' to ' + C_SteerStateStrings[cur_state]);
-
     //actions
     case cur_state of
-      ssAlign: begin
+      smAlign: begin
         AIAlign(ship, target, rotation);
       end;
-      ssSeek: begin
+      smSeek: begin
         AISeek(ship, target, rotation, thrust);
       end;
-      {ssCorrect: begin
-        AICorrect(ship, target, rotation, thrust);
-      end;}
-      ssStop: begin
+      smStop: begin
         AIStop(ship, rotation, thrust);
       end;
     end;
 
-    ship.controller.steer_state := cur_state;
+    ship.controller.move_state := cur_state;
   end;
 
   procedure AIAlign(const ship: TShip; const target: Point2D; var rotation: Double);
@@ -133,35 +154,6 @@ implementation
       thrust := True;
   end;
 
-  {procedure AICorrect(const ship: TShip; const target: Point2D; var rotation: Double; var thrust: Boolean);
-  var
-    distance: Double;
-    ship_vector, target_vector: Vector;
-    target_normal: Vector;
-    dot: Double;
-    angle: Double;
-    accuracy: Double;
-  begin
-    distance := CalculateDistWithWrap(ship.pos, target);
-
-    ship_vector := UnitVector(ship.vel);
-    target_vector := UnitVector(VectorFromAngle(CalculateAngleWithWrap(ship.pos, target), 1.0));
-    dot := DotProduct(ship_vector, target_vector);
-    angle := CalculateAngle(target_vector, ship_vector);
-
-    target_normal := VectorNormal(target_vector) * dot * distance;
-    if angle > 0 then begin
-      target_normal *= -1;
-    end;
-
-    AIAlign(ship, ship.pos + target_normal, rotation);
-
-    accuracy := CalcAccuracy(ship.rot, ship.pos, ship.pos + target_normal);
-
-    if (accuracy > 0.8) and (VectorMagnitude(ship.vel) < 5) then
-      thrust := True;
-  end;}
-
   procedure AIStop(const ship: TShip; var rotation: Double; var thrust: Boolean);
   var
     accuracy: Double;
@@ -174,7 +166,7 @@ implementation
       thrust := True;
   end;
 
-  function AIDistToStop(const ship: TShip; const target: Point2D; const radius: Integer): Boolean;
+  function AIDistToStop(const ship: TShip): Double;
   var
     vel_vector: Vector;
     facing_vector: Vector;
@@ -192,7 +184,7 @@ implementation
     speed := VectorMagnitude(ship.vel);
     time_to_stop := speed / PLAYER_ACCELERATION;
 
-    result := time_to_turn * speed + time_to_stop;
+    result := (time_to_turn + time_to_stop) * speed;
   end;
 
   function CalcAccuracy(const ship_rot: Double; const source_pos, target_pos: Vector): Double; overload;

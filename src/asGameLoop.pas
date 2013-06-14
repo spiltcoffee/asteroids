@@ -484,6 +484,7 @@ implementation
   var
     i: Integer;
     position: Point2D;
+    map_pos: Point2D;
   begin
     UpdateState(state,player,notes);
 
@@ -493,18 +494,25 @@ implementation
     if not state.paused then begin
       if state.playing then begin
         UpdateMap(state.map, asteroids);
-        while PathFinished(player.path) do begin
+        i := 0;
+        while PathFinished(player.path) and (i < 5) do begin
           position.x := random(state.res.width);
           position.y := random(state.res.height);
-          player.path := FindPath(state.map, player.pos, position);
+          map_pos := MapPosition(position);
+          if state.map[trunc(map_pos.x), trunc(map_pos.y)] then begin
+            player.path := CreateEmptyPath;
+            i += 1;
+          end
+          else begin
+            player.path := FindPath(state.map, player.pos, position);
+            i += 5;
+          end;
         end;
       end;
 
       if player.alive then begin
-        //WriteLn('a');
         UpdatePath(player.path, player.pos);
-        //WriteLn('b');
-        MoveShip(player,state,asteroids);
+        MoveShip(player,state);
       end;
 
       if enemy.alive then begin

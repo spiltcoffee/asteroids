@@ -11,7 +11,7 @@ interface
 
   procedure KillShip(var player: TShip; var state: TState; var debris: TDebrisArray; var notes: TNoteArray);
 
-  procedure MoveShip(var ship: TShip; const state: TState; const asteroids: TAsteroidArray);
+  procedure MoveShip(var ship: TShip; const state: TState);
 
   procedure DrawShip(const player: TShip);
 
@@ -38,7 +38,8 @@ implementation
     player.respawn := 0;
     player.int := 0;
     player.thrust := false;
-    player.controller.steer_state := ssAlign;
+    player.controller.move_state := smAlign;
+    player.controller.state := ssMove;
   end;
 
   procedure ResetShip(var player: TShip; var state: TState);
@@ -79,7 +80,7 @@ implementation
     end;
   end;
 
-  procedure MoveShip(var ship: TShip; const state: TState; const asteroids: TAsteroidArray);
+  procedure MoveShip(var ship: TShip; const state: TState);
   var
     thrust: Boolean;
     rotation: Double;
@@ -87,9 +88,9 @@ implementation
     thrust := False;
     rotation := 0;
     if ship.kind = SK_SHIP_PLAYER then
-      MovePlayer(ship, state, thrust, rotation)
+      MovePlayer(ship, state, rotation, thrust)
     else
-      MoveAI(ship, state, asteroids, thrust, rotation);
+      ShipAI(ship, rotation, thrust);
 
     ship.rot += rotation * PLAYER_ROTATION_SPEED;
 

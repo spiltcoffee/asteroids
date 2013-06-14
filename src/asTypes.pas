@@ -47,9 +47,11 @@ interface
     end;
 
     TPathFindEnum = (pfNone, pfUp, pfRight, pfDown, pfLeft);
+
 const
     C_PathFindPoint: array[TPathFindEnum] of Point2D = ((x: 0; y: 0), (x: 0; y: -1), (x: 1; y: 0), (x: 0; y: 1), (x: -1; y: 0)); //use to find neighbour
     C_PathFindOpposite: array[TPathFindEnum] of TPathFindEnum = (pfNone, pfDown, pfLeft, pfUp, pfRight);
+
 type
     TCollision = record
       i: Integer;
@@ -117,10 +119,9 @@ type
     );
 
     TMoveState = (
+      smAlign,
       smSeek,
-      smCorrect,
-      smStop,
-      smAlign
+      smStop
     );
 
     TShipState = (
@@ -132,7 +133,6 @@ const
     C_MoveStateStrings: array[TMoveState] of string = (
       'align',
       'seek',
-      'correct',
       'stop'
     );
 
@@ -140,8 +140,8 @@ const
       'move',
       'arrive'
     );
-type
 
+type
     TController = record
       move_state: TMoveState;
       state: TShipState;

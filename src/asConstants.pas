@@ -77,6 +77,9 @@ interface
     DEBRIS_SPEED_MODIFIER = 3;
     DEBRIS_MAXROTATION = 15;
 
+    MAP_CELL_SIZE = 20;
+    MAP_RADIUS_BUFFER = 1;
+
 implementation
 
 end.

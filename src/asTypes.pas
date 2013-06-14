@@ -38,6 +38,19 @@ interface
       Input
     );
 
+    TMap = array of array of Boolean;
+
+    TPath = record
+      points: array of Point2D;
+      current: Integer;
+      looped: Boolean;
+    end;
+
+    TPathFindEnum = (pfNone, pfUp, pfRight, pfDown, pfLeft);
+const
+    C_PathFindPoint: array[TPathFindEnum] of Point2D = ((x: 0; y: 0), (x: 0; y: -1), (x: 1; y: 0), (x: 0; y: 1), (x: -1; y: 0)); //use to find neighbour
+    C_PathFindOpposite: array[TPathFindEnum] of TPathFindEnum = (pfNone, pfDown, pfLeft, pfUp, pfRight);
+type
     TCollision = record
       i: Integer;
       j: Integer;
@@ -49,6 +62,7 @@ interface
       paused: Boolean;
       fullscreen: Boolean;
       res: Size;
+      map: TMap;
       sfxvolume: Integer;
       musicvolume: Integer;
       quit: Boolean;
@@ -102,24 +116,35 @@ interface
       SK_UFO_AI
     );
 
-    TSteerState = (
-      ssSeek,
-      ssCorrect,
-      ssStop,
-      ssAlign
+    TMoveState = (
+      smSeek,
+      smCorrect,
+      smStop,
+      smAlign
+    );
+
+    TShipState = (
+      ssMove,
+      ssArrive
     );
 
 const
-C_SteerStateStrings: array[TSteerState] of string = (
+    C_MoveStateStrings: array[TMoveState] of string = (
       'align',
       'seek',
       'correct',
       'stop'
-      );
+    );
+
+    C_ShipStateStrings: array[TShipState] of string = (
+      'move',
+      'arrive'
+    );
 type
 
     TController = record
-      steer_state: TSteerState;
+      move_state: TMoveState;
+      state: TShipState;
     end;
 
     TShip = record
@@ -136,6 +161,7 @@ type
       int: Integer; //interval (for bullet)
       thrust: Boolean;
       controller: TController;
+      path: TPath;
     end;
 
     TAsteroid = record

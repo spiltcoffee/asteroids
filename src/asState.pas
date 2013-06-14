@@ -12,7 +12,7 @@ interface
   procedure DrawState(const state: TState);
 
 implementation
-  uses sgCore, sgGeometry, sgGraphics, sgText, sgTypes, asConstants, asDraw, asNotes, SysUtils, Math;
+  uses sgCore, sgGeometry, sgGraphics, sgText, sgTypes, asConstants, asDraw, asNotes, SysUtils, Math, asInfluenceMap;
 
   function GetTargetAsteroidCount(const score: Integer): Integer;
   begin

@@ -18,7 +18,7 @@ interface
 implementation
   uses sgCamera, sgCore, sgGeometry, sgGraphics, sgInput, sgTypes, asAsteroids, asAudio,
        asCollisions, asConstants, asDraw, asEnemy, asEffects, asExtras, asMenu, asNotes,
-       asShip, asState
+       asShip, asState, asInfluenceMap, asPath
 
        {REMOVE}, SysUtils;
 
@@ -26,31 +26,30 @@ implementation
   begin
     ProcessEvents();
 
-    if state.readingtext and (not ReadingText() or TextEntryCancelled()) then
-    begin
+    if state.readingtext and (not ReadingText() or TextEntryCancelled()) then begin
       state.name := TextReadAsASCII();
       state.readingtext := false;
       menu.disabled := false;
     end
-    else if state.playing and not menu.disabled and KeyTyped(VK_ESCAPE) then
-    begin
+    else if state.playing and not menu.disabled and KeyTyped(VK_ESCAPE) then begin
       state.paused := not state.paused;
       menu.visible := not menu.visible;
-      if state.paused then
-      begin
+
+      if state.paused then begin
         StopAllSoundEffects();
         PlayMenuChangeEffect(state);
       end;
     end
-    else if (KeyDown(VK_LMETA) or KeyDown(VK_RMETA)) and KeyTyped(VK_Q) then
+    else if (KeyDown(VK_LMETA) or KeyDown(VK_RMETA)) and KeyTyped(VK_Q) then begin
       state.quit := true
-    else if (KeyDown(VK_LALT) or KeyDown(VK_RALT)) and KeyTyped(VK_RETURN) then
-    begin
+    end
+    else if (KeyDown(VK_LALT) or KeyDown(VK_RALT)) and KeyTyped(VK_RETURN) then begin
       ToggleFullScreen();
       state.fullscreen := not state.fullscreen;
     end
-    else if menu.visible and not menu.disabled and (KeyTyped(VK_UP) or KeyTyped(VK_DOWN) or KeyDown(VK_LEFT) or KeyDown(VK_RIGHT) or KeyTyped(VK_RETURN)) then
+    else if menu.visible and not menu.disabled and (KeyTyped(VK_UP) or KeyTyped(VK_DOWN) or KeyDown(VK_LEFT) or KeyDown(VK_RIGHT) or KeyTyped(VK_RETURN)) then begin
       MoveMenu(menu,state);
+    end;
   end;
 
   procedure SetupGame(var state: TState; var menu: TMenu; var player, enemy: TShip; var asteroids: TAsteroidArray; var bullets: TBulletArray; var debris: TDebrisArray; var notes: TNoteArray);
@@ -59,6 +58,7 @@ implementation
     StartMusic();
 
     SetupState(state);
+    CreateMap(state.map, state.res);
     state.transition := FadeIn;
     state.time := STATE_FADE_TIME;
     state.perform := NoCommand;
@@ -66,6 +66,7 @@ implementation
     SetupMenu(menu);
 
     CreateShip(player);
+    player.path := CreateEmptyPath;
 
     SetupEnemy(enemy);
 
@@ -81,43 +82,42 @@ implementation
 
   procedure CreateObjects(var state: TState; var menu: TMenu; var player, enemy: TShip; var asteroids: TAsteroidArray; var bullets: TBulletArray);
   begin
-    if not state.paused then
-    begin
+    if not state.paused then begin
       if (player.respawn > 0) then
         player.respawn -= 1;
 
-      if not player.alive and state.playing then
-      begin
-        if (state.lives > 0) and (player.respawn < PLAYER_RESPAWN_SHOW) then
-        begin
+      if not player.alive and state.playing then begin
+
+        if (state.lives > 0) and (player.respawn < PLAYER_RESPAWN_SHOW) then begin
           PlayRespawnEffect(state);
           ResetShip(player,state);
         end
-        else if (state.lives = 0) and (player.respawn = 0) then
-        begin
+        else if (state.lives = 0) and (player.respawn = 0) then begin
           StartMenuCommand(GameOver,state,menu);
         end;
+
       end;
 
       while NeedMoreAsteroids(state.score, asteroids) do
         CreateAsteroid(asteroids,player,true);
 
-      if player.alive and (player.int = 0) and KeyDown(VK_SPACE) then
-      begin
+      if player.alive and (player.int = 0) and KeyDown(VK_SPACE) then begin
         PlayBulletEffect(state);
         player.int := PLAYER_BULLET_INTERVAL;
         CreateBullet(bullets,player,player); //second player is kinda pointless, but I got nothing else to put there!
       end;
 
-      if not enemy.alive and (state.enemylives > 0) then
-      begin
+      if not enemy.alive and (state.enemylives > 0) then begin
         CreateEnemy(enemy,player,asteroids);
       end;
 
-      if enemy.alive and player.alive and (enemy.int = 0) and CreateBullet(bullets,enemy,player) then
-      begin
+      if enemy.alive and player.alive and (enemy.int = 0) and CreateBullet(bullets,enemy,player) then begin
         PlayBulletEffect(state);
         enemy.int := ENEMY_BULLET_INTERVAL;
+      end;
+
+      if state.playing then begin
+        ResetMap(state.map);
       end;
     end;
   end;
@@ -483,58 +483,76 @@ implementation
   procedure MoveGame(var state: TState; var menu: TMenu; var player, enemy: TShip; var asteroids: TAsteroidArray; var bullets: TBulletArray; var debris: TDebrisArray; var notes: TNoteArray);
   var
     i: Integer;
+    position: Point2D;
   begin
     UpdateState(state,player,notes);
+
     if (state.perform <> NoCommand) and (state.time = 0) then
       EndMenuCommand(state,menu,player,enemy,asteroids,bullets,debris,notes);
 
-    if not state.paused then
-    begin
-      if player.alive then
+    if not state.paused then begin
+      if state.playing then begin
+        UpdateMap(state.map, asteroids);
+        while PathFinished(player.path) do begin
+          position.x := random(state.res.width);
+          position.y := random(state.res.height);
+          player.path := FindPath(state.map, player.pos, position);
+        end;
+      end;
+
+      if player.alive then begin
+        //WriteLn('a');
+        UpdatePath(player.path, player.pos);
+        //WriteLn('b');
         MoveShip(player,state,asteroids);
+      end;
 
-      if enemy.alive then
+      if enemy.alive then begin
         MoveEnemy(enemy,state,player,asteroids);
+      end;
 
-      for i := 0 to High(asteroids) do
+      for i := 0 to High(asteroids) do begin
         MoveAsteroid(asteroids[i]);
+      end;
 
       i := 0;
-      while i <= High(bullets) do
-      begin
+      while i <= High(bullets) do begin
         MoveBullet(bullets[i]);
-        if bullets[i].life <= (BULLET_END + 1) then
-        begin
+
+        if bullets[i].life <= (BULLET_END + 1) then begin
           Remove(bullets,i);
           i -= 1;
         end;
+
         i += 1;
       end;
 
       i := 0;
-      while i <= High(debris) do
-      begin
+      while i <= High(debris) do begin
         MoveDebris(debris[i]);
-        if debris[i].life <= 0 then
-        begin
+
+        if debris[i].life <= 0 then begin
           Remove(debris,i);
           i -= 1;
         end;
+
         i += 1;
       end;
 
       i := 0;
-      while i <= High(notes) do
-      begin
+      while i <= High(notes) do begin
         MoveNote(notes[i]);
-        if notes[i].life <= 0 then
-        begin
+
+        if notes[i].life <= 0 then begin
           Remove(notes,i);
           i -= 1;
         end;
+
         i += 1;
       end;
+
     end;
+
   end;
 
   procedure DrawGame(const state: TState; const menu: TMenu; const player, enemy: TShip; const asteroids: TAsteroidArray; const bullets: TBulletArray; const debris: TDebrisArray; const notes: TNoteArray);
@@ -543,28 +561,37 @@ implementation
   begin
     ClearScreen();
 
-    for i := 0 to High(notes) do
+    for i := 0 to High(notes) do begin
       DrawNote(notes[i]);
+    end;
 
-    if player.alive then
+    if player.alive then begin
       DrawShip(player);
+      DrawPath(player.path);
+    end;
 
-    if enemy.alive then
+    if enemy.alive then begin
       DrawEnemy(enemy);
+    end;
 
-    for i := 0 to High(asteroids) do
+    for i := 0 to High(asteroids) do begin
       DrawAsteroid(asteroids[i]);
+    end;
 
-    for i := 0 to High(bullets) do
+    for i := 0 to High(bullets) do begin
       DrawBullet(bullets[i]);
+    end;
 
-    for i := 0 to High(debris) do
+    for i := 0 to High(debris) do begin
       DrawDebris(debris[i]);
+    end;
 
-    if menu.visible then
+    if menu.visible then begin
       DrawMenu(menu,state);
+    end;
 
     DrawState(state);
+    DrawMap(state.map, state.res);
   end;
 
 end.

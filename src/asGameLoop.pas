@@ -494,18 +494,34 @@ implementation
     if not state.paused then begin
       if state.playing then begin
         UpdateMap(state.map, asteroids);
-        i := 0;
-        while PathFinished(player.path) and (i < 5) do begin
-          position.x := random(state.res.width);
-          position.y := random(state.res.height);
-          map_pos := MapPosition(position);
-          if state.map[trunc(map_pos.x), trunc(map_pos.y)] then begin
-            player.path := CreateEmptyPath;
-            i += 1;
+
+        if player.controller.pathfind_timeout > 0 then begin
+          player.controller.pathfind_timeout -= 1;
+        end
+        else begin
+
+          if not PathStillValid(player.path, state.map) then begin
+            player.path := FindPath(state.map, player.pos, asteroids[0].pos{PathEnd(player.path)});
+            player.controller.pathfind_timeout += 30;
           end
           else begin
-            player.path := FindPath(state.map, player.pos, position);
-            i += 5;
+
+            i := 0;
+            while PathFinished(player.path) and (i < 5) do begin
+              position.x := random(state.res.width);
+              position.y := random(state.res.height);
+              map_pos := MapPosition(position);
+              if state.map[trunc(map_pos.x), trunc(map_pos.y)] > 256 then begin
+                player.path := CreateEmptyPath;
+                i += 1;
+              end
+              else begin
+                player.path := FindPath(state.map, player.pos, asteroids[0].pos{position});
+                i += 5;
+                player.controller.pathfind_timeout += 30;
+              end;
+            end;
+
           end;
         end;
       end;

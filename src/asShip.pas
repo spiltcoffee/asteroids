@@ -40,6 +40,7 @@ implementation
     player.thrust := false;
     player.controller.move_state := smAlign;
     player.controller.state := ssMove;
+    player.controller.pathfind_timeout := 0;
   end;
 
   procedure ResetShip(var player: TShip; var state: TState);

@@ -38,7 +38,7 @@ interface
       Input
     );
 
-    TMap = array of array of Boolean;
+    TMap = array of array of Integer;
 
     TPath = record
       points: array of Point2D;
@@ -145,6 +145,7 @@ type
     TController = record
       move_state: TMoveState;
       state: TShipState;
+      pathfind_timeout: Integer;
     end;
 
     TShip = record

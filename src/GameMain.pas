@@ -29,7 +29,7 @@ begin
   SetupGame(state,menu,player,enemy,asteroids,bullets,debris,notes);
 
   repeat // The game loop...
-    GameProcessEvents(state,menu);
+    GameProcessEvents(state,menu,player);
     CreateObjects(state,menu,player,enemy,asteroids,bullets);
     CollideObjects(state,player,enemy,asteroids,bullets,debris,notes);
     MoveGame(state,menu,player,enemy,asteroids,bullets,debris,notes);

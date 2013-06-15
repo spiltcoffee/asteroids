@@ -39,7 +39,7 @@ implementation
     player.int := 0;
     player.thrust := false;
     player.controller.move_state := smAlign;
-    player.controller.state := ssMove;
+    player.controller.arrive_state := ssMove;
     player.controller.pathfind_timeout := 0;
   end;
 
@@ -85,13 +85,16 @@ implementation
   var
     thrust: Boolean;
     rotation: Double;
+    shooting: Boolean;
   begin
     thrust := False;
     rotation := 0;
     if ship.kind = SK_SHIP_PLAYER then
-      MovePlayer(ship, state, rotation, thrust)
+      ShipPlayer(ship, state, rotation, thrust, shooting)
     else
-      ShipAI(ship, rotation, thrust);
+      ShipAI(ship, rotation, thrust, shooting);
+
+    ship.shooting := shooting;
 
     ship.rot += rotation * PLAYER_ROTATION_SPEED;
 

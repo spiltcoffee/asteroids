@@ -81,6 +81,7 @@ type
       enemynext: Integer; //points for next enemy
       pos: Point2D; //for drawing things
       ignoreCollision: TCollisionArray;
+      debug: Boolean;
     end;
 
     TMenuItem = record
@@ -124,7 +125,7 @@ type
       smStop
     );
 
-    TShipState = (
+    TArriveState = (
       ssMove,
       ssArrive
     );
@@ -136,7 +137,7 @@ const
       'stop'
     );
 
-    C_ShipStateStrings: array[TShipState] of string = (
+    C_ArriveStateStrings: array[TArriveState] of string = (
       'move',
       'arrive'
     );
@@ -144,7 +145,7 @@ const
 type
     TController = record
       move_state: TMoveState;
-      state: TShipState;
+      arrive_state: TArriveState;
       pathfind_timeout: Integer;
     end;
 
@@ -163,6 +164,7 @@ type
       thrust: Boolean;
       controller: TController;
       path: TPath;
+      shooting: Boolean;
     end;
 
     TAsteroid = record

@@ -44,6 +44,7 @@ implementation
       transition := NoFade;
       time := 0;
       perform := NoCommand;
+      debug := True;
     end;
   end;
 

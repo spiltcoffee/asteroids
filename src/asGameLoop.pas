@@ -3,7 +3,7 @@ unit asGameLoop;
 interface
   uses asTypes;
 
-  procedure GameProcessEvents(var state: TState; var menu: TMenu);
+  procedure GameProcessEvents(var state: TState; var menu: TMenu; var ship: TShip);
 
   procedure SetupGame(var state: TState; var menu: TMenu; var player, enemy: TShip; var asteroids: TAsteroidArray; var bullets: TBulletArray; var debris: TDebrisArray; var notes: TNoteArray);
 
@@ -22,7 +22,7 @@ implementation
 
        {REMOVE}, SysUtils;
 
-  procedure GameProcessEvents(var state: TState; var menu: TMenu);
+  procedure GameProcessEvents(var state: TState; var menu: TMenu; var ship: TShip);
   begin
     ProcessEvents();
 
@@ -46,6 +46,19 @@ implementation
     else if (KeyDown(VK_LALT) or KeyDown(VK_RALT)) and KeyTyped(VK_RETURN) then begin
       ToggleFullScreen();
       state.fullscreen := not state.fullscreen;
+    end
+    else if KeyTyped(VK_BACKQUOTE) then begin
+      if (KeyDown(VK_LMETA) or KeyDown(VK_RMETA)) then begin
+        if ship.kind = SK_SHIP_PLAYER then begin
+          ship.kind := SK_SHIP_AI;
+        end
+        else begin
+          ship.kind := SK_SHIP_PLAYER;
+        end;
+      end
+      else begin
+        state.debug := not state.debug;
+      end;
     end
     else if menu.visible and not menu.disabled and (KeyTyped(VK_UP) or KeyTyped(VK_DOWN) or KeyDown(VK_LEFT) or KeyDown(VK_RIGHT) or KeyTyped(VK_RETURN)) then begin
       MoveMenu(menu,state);
@@ -101,11 +114,12 @@ implementation
       while NeedMoreAsteroids(state.score, asteroids) do
         CreateAsteroid(asteroids,player,true);
 
-      if player.alive and (player.int = 0) and KeyDown(VK_SPACE) then begin
+      if player.alive and (player.int = 0) and player.shooting then begin
         PlayBulletEffect(state);
         player.int := PLAYER_BULLET_INTERVAL;
         CreateBullet(bullets,player,player); //second player is kinda pointless, but I got nothing else to put there!
       end;
+      player.shooting := False;
 
       if not enemy.alive and (state.enemylives > 0) then begin
         CreateEnemy(enemy,player,asteroids);
@@ -501,7 +515,7 @@ implementation
         else begin
 
           if not PathStillValid(player.path, state.map) then begin
-            player.path := FindPath(state.map, player.pos, asteroids[0].pos{PathEnd(player.path)});
+            player.path := FindPath(state.map, player.pos, PathEnd(player.path));
             player.controller.pathfind_timeout += 30;
           end
           else begin
@@ -516,7 +530,7 @@ implementation
                 i += 1;
               end
               else begin
-                player.path := FindPath(state.map, player.pos, asteroids[0].pos{position});
+                player.path := FindPath(state.map, player.pos, position);
                 i += 5;
                 player.controller.pathfind_timeout += 30;
               end;
@@ -591,7 +605,9 @@ implementation
 
     if player.alive then begin
       DrawShip(player);
-      DrawPath(player.path);
+      if state.debug then begin
+        DrawPath(player.path);
+      end;
     end;
 
     if enemy.alive then begin
@@ -615,7 +631,9 @@ implementation
     end;
 
     DrawState(state);
-    DrawMap(state.map, state.res);
+    if state.debug then begin
+      DrawMap(state.map, state.res);
+    end;
   end;
 
 end.

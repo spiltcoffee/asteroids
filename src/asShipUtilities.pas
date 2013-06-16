@@ -124,7 +124,7 @@ implementation
       Result += trunc(target_future_range * AICalcAccuracy(ship.rot, ship.pos, target, False)); //increases if facing enemy, decreases if back to enemy
     end
     else begin
-      Result := 10000;
+      Result := 100000;
     end;
   end;
 
@@ -175,7 +175,7 @@ implementation
       Result := trunc(PointPointDistance(ship.pos, target)) * 3;
     end
     else begin
-      Result := 10000;
+      Result := 100000;
     end;
   end;
 
@@ -194,7 +194,7 @@ implementation
     target_future: Vector;
     time: Integer;
   begin
-    Result := 10000;
+    Result := 100000;
     if ship.int = 0 then begin
       for time := trunc(BULLET_START/AI_SHOOT_STEP) downto 0 do begin
         bullet_future := ship.pos + (ship.vel * time * AI_SHOOT_STEP);
@@ -209,9 +209,6 @@ implementation
         target := enemy.pos + (enemy.vel * time * AI_SHOOT_STEP);
         result := trunc(PointPointDistance(ship.pos, target) + (-1 * AICalcAccuracy(ship.rot, ship.pos, target, False)) * AI_SHOOT_ACCURACY_FACTOR);
       end;
-    end
-    else begin
-      Result := 10000;
     end;
   end;
 
@@ -268,7 +265,7 @@ implementation
       Result := trunc(target_future_range * 2 + (-1 * AICalcAccuracy(ship.rot, ship.pos, target, False)) * AI_SHOOT_ACCURACY_FACTOR);
     end
     else begin
-      Result := 10000;
+      Result := 100000;
     end;
   end;
 
@@ -282,7 +279,7 @@ implementation
   //acts as cut off value. If any one of the above is higher than this utility, the above utility is ignored
   function UtilIdle(const ship: TShip; const asteroids: TAsteroidArray; const enemy: TShip; const map: TMap; var target: Point2D): Integer;
   begin
-    Result := 5000 + trunc(sqrt((ScreenWidth()-1440)**2 + (ScreenHeight()-900)**2));
+    Result := 5000 + trunc(sqrt((ScreenWidth()-1440)**2 + (ScreenHeight()-900)**2)) * 3;
   end;
 
   procedure ActionIdle(var ship: TShip; const asteroids: TAsteroidArray; const enemy: TShip; const map: TMap; const target: Point2D; var rotation: Double; var thrust: Boolean; var shooting: Boolean);

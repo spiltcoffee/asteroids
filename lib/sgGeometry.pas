@@ -2561,8 +2561,15 @@ implementation
       TraceEnter('sgGeometry', 'PointPointDistance(const pt1, pt2: Point2D): Single', '');
     {$ENDIF}
 
-    temp := VectorTo(pt2.x - pt1.x, pt2.y - pt1.y);
-    result := VectorMagnitude(temp);
+    try
+      temp := VectorTo(pt2.x - pt1.x, pt2.y - pt1.y);
+      result := VectorMagnitude(temp);
+    except
+      on E: Exception do begin
+        WriteLn('Exception in PointPointDistance: ' + E.Message);
+        Exit;
+      end;
+    end;
 
     {$IFDEF TRACE}
       TraceExit('sgGeometry', 'PointPointDistance(const pt1, pt2: Point2D): Single', '');

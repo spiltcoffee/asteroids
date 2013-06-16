@@ -10,6 +10,8 @@ interface
   procedure CreateDebris(const asteroid: TAsteroid; var debris: TDebrisArray); overload;
   procedure CreateDebris(const ship: TShip; var debris: TDebrisArray); overload;
 
+  procedure CreateSpawnDebris(const ship: TShip; var debris: TDebrisArray);
+
   procedure MoveBullet(var bullet: TBullet);
 
   procedure MoveDebris(var debris: TDebris);
@@ -186,6 +188,28 @@ implementation
         debris[new].col := $FFFF9900;
       end;
     end;
+  end;
+
+  procedure CreateSpawnDebris(const ship: TShip; var debris: TDebrisArray);
+  var
+    new: Integer;
+  begin
+    SetLength(debris,Length(debris) + 1);
+    new := High(debris);
+
+    SetLength(debris[new].point,1);
+    debris[new].point[0].y := 0;
+    debris[new].point[0].x := ship.rad;
+
+    debris[new].pos := ship.pos;
+    debris[new].rot.angle := 0;
+    debris[new].rot.speed := 0;
+    debris[new].vel.x := 0;
+    debris[new].vel.y := 0;
+
+    debris[new].life := DEBRIS_START;
+    debris[new].kind := Circle;
+    debris[new].col := ship.color;
   end;
 
   procedure MoveBullet(var bullet: TBullet);

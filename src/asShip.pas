@@ -7,7 +7,7 @@ interface
 
   procedure ResetShip(var ship: TShip; const asteroids: TAsteroidArray; const enemy: TShip);
 
-  procedure SpawnShip(var ship: TShip; const asteroids: TAsteroidArray; const enemy: TShip);
+  procedure SpawnShip(var ship: TShip; var debris: TDebrisArray; const asteroids: TAsteroidArray; const enemy: TShip);
 
   procedure KillShip(var ship: TShip; var debris: TDebrisArray);
 
@@ -89,10 +89,11 @@ implementation
     ship.controller.target.y := 0;
   end;
 
-  procedure SpawnShip(var ship: TShip; const asteroids: TAsteroidArray; const enemy: TShip);
+  procedure SpawnShip(var ship: TShip; var debris: TDebrisArray; const asteroids: TAsteroidArray; const enemy: TShip);
   begin
     ResetShip(ship, asteroids, enemy);
     ship.respawn := PLAYER_RESPAWN_SHOW;
+    CreateSpawnDebris(ship, debris);
   end;
 
   procedure KillShip(var ship: TShip; var debris: TDebrisArray);

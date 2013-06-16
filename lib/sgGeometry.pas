@@ -1332,7 +1332,7 @@ interface
   ///
   /// @class Vector
   /// @getter MagnitudeSq
-  function VectorMagnitudeSq(const v: Vector): Single;
+  function VectorMagnitudeSq(const v: Vector): Double;
 
   /// Returns a new `Vector` created using the angle and magnitude (length).
   /// The angle and magnitude are scalar values and the angle is in degrees.
@@ -2302,15 +2302,15 @@ implementation
     {$ENDIF}
   end;
 
-  function VectorMagnitudeSq(const v: Vector): Single;
+  function VectorMagnitudeSq(const v: Vector): Double;
   begin
     {$IFDEF TRACE}
-      TraceEnter('sgGeometry', 'VectorMagnitudeSq(const v: Vector): Single', '');
+      TraceEnter('sgGeometry', 'VectorMagnitudeSq(const v: Vector): Double', '');
     {$ENDIF}
     result := (v.x * v.x) + (v.y * v.y);
 
     {$IFDEF TRACE}
-      TraceExit('sgGeometry', 'VectorMagnitudeSq(const v: Vector): Single', '');
+      TraceExit('sgGeometry', 'VectorMagnitudeSq(const v: Vector): Double', '');
     {$ENDIF}
   end;
 

@@ -26,7 +26,7 @@ interface
   procedure ActionIdle(var ship: TShip; const asteroids: TAsteroidArray; const enemy: TShip; const map: TMap; const target: Point2D; var rotation: Double; var thrust: Boolean; var shooting: Boolean);
 
 implementation
-  uses asShipController, sgGeometry, asOffscreen, asConstants, asPath, sgGraphics, math, asCollisions;
+  uses asShipController, sgGeometry, asOffscreen, asConstants, asPath, sgGraphics, math, asCollisions, sgCore;
 
   function GetActionUtil(action: TShipAction): TActionUtilFunc;
   begin
@@ -263,6 +263,7 @@ implementation
     if found and (time * AI_EVADE_STEP < BULLET_START) then begin
       bullet_future := ship.pos + (ship.vel * time * AI_EVADE_STEP);
       bullet_future_range := trunc(BULLET_SPEED * time * AI_EVADE_STEP);
+      target := asteroids[i].pos + asteroids[i].vel * time * AI_EVADE_STEP;
       target_future_range := PointPointDistance(target, bullet_future);
       Result := trunc(target_future_range * 2 + (-1 * AICalcAccuracy(ship.rot, ship.pos, target, False)) * AI_SHOOT_ACCURACY_FACTOR);
     end
@@ -281,7 +282,7 @@ implementation
   //acts as cut off value. If any one of the above is higher than this utility, the above utility is ignored
   function UtilIdle(const ship: TShip; const asteroids: TAsteroidArray; const enemy: TShip; const map: TMap; var target: Point2D): Integer;
   begin
-    Result := 5000;
+    Result := 5000 + trunc(sqrt((ScreenWidth()-1440)**2 + (ScreenHeight()-900)**2));
   end;
 
   procedure ActionIdle(var ship: TShip; const asteroids: TAsteroidArray; const enemy: TShip; const map: TMap; const target: Point2D; var rotation: Double; var thrust: Boolean; var shooting: Boolean);

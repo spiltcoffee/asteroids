@@ -7,7 +7,7 @@ interface
 
   procedure SetupGame(var state: TState; var menu: TMenu; var player, enemy: TShip; var asteroids: TAsteroidArray; var bullets: TBulletArray; var debris: TDebrisArray; var notes: TNoteArray);
 
-  procedure CreateObjects(var state: TState; var menu: TMenu; var player, enemy: TShip; var asteroids: TAsteroidArray; var bullets: TBulletArray);
+  procedure CreateObjects(var state: TState; var menu: TMenu; var player, enemy: TShip; var asteroids: TAsteroidArray; var bullets: TBulletArray; var debris: TDebrisArray);
 
   procedure CollideObjects(var state: TState; var player, enemy: TShip; var asteroids: TAsteroidArray; var bullets: TBulletArray; var debris: TDebrisArray; var notes: TNoteArray);
 
@@ -94,7 +94,7 @@ implementation
     SetLength(notes,0);
   end;
 
-  procedure CreateObjects(var state: TState; var menu: TMenu; var player, enemy: TShip; var asteroids: TAsteroidArray; var bullets: TBulletArray);
+  procedure CreateObjects(var state: TState; var menu: TMenu; var player, enemy: TShip; var asteroids: TAsteroidArray; var bullets: TBulletArray; var debris: TDebrisArray);
   begin
     if not state.paused then begin
       if (player.respawn > 0) then
@@ -106,12 +106,12 @@ implementation
 
         if not player.alive and (player.respawn < PLAYER_RESPAWN_SHOW) then begin
           PlayRespawnEffect(state);
-          SpawnShip(player, asteroids, enemy);
+          SpawnShip(player, debris, asteroids, enemy);
         end;
 
         if not enemy.alive and (enemy.respawn < PLAYER_RESPAWN_SHOW) then begin
           PlayRespawnEffect(state);
-          SpawnShip(enemy, asteroids, player);
+          SpawnShip(enemy, debris, asteroids, player);
         end;
 
       end;

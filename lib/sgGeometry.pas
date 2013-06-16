@@ -1323,7 +1323,7 @@ interface
   ///
   /// @class Vector
   /// @getter Magnitude
-  function VectorMagnitude(const v: Vector): Single;
+  function VectorMagnitude(const v: Vector): Double;
 
   /// Returns the squared magnitude (or "length") of the parameter vector (v) as a
   /// scalar value.
@@ -1569,7 +1569,7 @@ interface
   ///
   /// @class Point2D
   /// @method DistanceTo
-  function PointPointDistance(const pt1, pt2: Point2D): Single;
+  function PointPointDistance(const pt1, pt2: Point2D): Double;
 
   //---------------------------------------------------------------------------
   // Point2D  Operations
@@ -2289,7 +2289,7 @@ implementation
     {$ENDIF}
   end;
 
-  function VectorMagnitude(const v: Vector): Single;
+  function VectorMagnitude(const v: Vector): Double;
   begin
     {$IFDEF TRACE}
       TraceEnter('sgGeometry', 'VectorMagnitude(const v: Vector): Single', '');
@@ -2546,7 +2546,7 @@ implementation
     {$ENDIF}
   end;
 
-  function PointPointDistance(const pt1, pt2: Point2D): Single;
+  function PointPointDistance(const pt1, pt2: Point2D): Double;
   var
     temp: Vector;
   begin

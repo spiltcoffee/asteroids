@@ -2307,7 +2307,14 @@ implementation
     {$IFDEF TRACE}
       TraceEnter('sgGeometry', 'VectorMagnitudeSq(const v: Vector): Double', '');
     {$ENDIF}
-    result := (v.x * v.x) + (v.y * v.y);
+    try
+      result := (v.x * v.x) + (v.y * v.y);
+    except
+      on E: Exception do begin
+        WriteLn('Exception in VectorMagnitudeSq: ' + E.Message);
+        Exit;
+      end;
+    end;
 
     {$IFDEF TRACE}
       TraceExit('sgGeometry', 'VectorMagnitudeSq(const v: Vector): Double', '');

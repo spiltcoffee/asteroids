@@ -5,7 +5,7 @@ interface
 
   procedure ShipPlayer(var player: TShip; const state: TState; var rotation: Double; var thrust: Boolean; var shooting: Boolean);
 
-  procedure ShipAI(var ship: TShip; var rotation: Double; var thrust: Boolean; var shooting: Boolean);
+  procedure ShipAI(var ship: TShip; const asteroids: TAsteroidArray; const enemy: TShip; const map: TMap; var rotation: Double; var thrust: Boolean; var shooting: Boolean);
 
   procedure AIArrive(var ship: TShip; const target: Point2D; var rotation: Double; var thrust: Boolean; const wrap: Boolean = True);
   procedure AIMove(var ship: TShip; const target: Point2D; var rotation: Double; var thrust: Boolean; const wrap: Boolean = True);
@@ -14,15 +14,23 @@ interface
   procedure AISeek(const ship: TShip; const target: Point2D; var rotation: Double; var thrust: Boolean; const wrap: Boolean);
   procedure AIStop(const ship: TShip; var rotation: Double; var thrust: Boolean);
   procedure AIEvade(const ship: TShip; const target: Point2D; var rotation: Double; var thrust: Boolean);
-  //checks if the ship would need to start turning and stopping right now in order to successfully stop on something or avoid something
+  procedure AIShoot(const ship: TShip; const target: Point2D; var rotation: Double; var thrust: Boolean; var shooting: Boolean);
+
+  function AITimeToTurn(const ship: TShip): Double;
+  //calculates how much time would be taken before being able to stop
+  function AITimeToStop(const ship: TShip): Double;
+  //calculates how much distance would be covered before being able to stop
   function AIDistToStop(const ship: TShip): Double;
 
-  function AICalcAccuracy(const ship_rot: Double; const source_pos, target_pos: Vector): Double; overload;
-  function AICalcAccuracy(const ship_vector: Vector; const source_pos, target_pos: Vector): Double; overload;
+  //calculates a value between 1.0 and -1.0 that represents how accuracte the ship is in respect to a target
+  function AICalcAccuracy(const ship_rot: Double; const source_pos, target_pos: Point2D; const wrap: Boolean): Double; overload;
+  function AICalcAccuracy(const ship_vector: Vector; const source_pos, target_pos: Point2D; const wrap: Boolean): Double; overload;
+
+  function AISpeedInFacing(const rot: Double; const vel: Vector): Double;
 
 implementation
   uses sgCore, sgGeometry, sgInput, asAudio, asConstants, asDraw, sgGraphics, asEffects, asNotes, asOffscreen,
-  sysutils, asPath;
+       sysutils, asPath, asShipUtilities;
 
   procedure ShipPlayer(var player: TShip; const state: TState; var rotation: Double; var thrust: Boolean; var shooting: Boolean);
   begin
@@ -41,15 +49,74 @@ implementation
       shooting := True;
   end;
 
-  procedure ShipAI(var ship: TShip; var rotation: Double; var thrust: Boolean; var shooting: Boolean);
+  procedure ShipAI(var ship: TShip; const asteroids: TAsteroidArray; const enemy: TShip; const map: TMap; var rotation: Double; var thrust: Boolean; var shooting: Boolean);
   var
+    action: TShipAction;
+    best_action: TShipAction;
+    utility: Integer;
+    best_action_utility: Integer;
+    ActionUtilFunc: TActionUtilFunc;
+    ActionProc: TActionProc;
     target: Point2D;
+    best_target: Point2D;
   begin
-    target := CurrentPoint(ship.path);
-
-    AIArrive(ship, target, rotation, thrust, false);
-
+    rotation := 0;
+    thrust := False;
     shooting := False;
+
+    if ship.controller.gob_timeout = 0 then begin
+      best_action_utility := -1;
+      best_target.x := 0;
+      best_target.y := 0;
+
+      Write('Utilities: ');
+
+      for action in [Low(TShipAction)..High(TShipAction)] do begin
+        target.x := 0;
+        target.y := 0;
+
+        Write(C_ShipActionStrings[action], ', ');
+
+        try
+          ActionUtilFunc := GetActionUtil(action);
+          utility := ActionUtilFunc(ship, asteroids, enemy, map, target);
+
+          if (best_action_utility = -1) or (utility < best_action_utility) then begin
+            best_action := action;
+            best_action_utility := utility;
+            best_target := target;
+
+          end;
+
+        except
+          on E: Exception do begin
+            WriteLn('Exception in asShipController.ShipAI when running Utility: ' + E.Message);
+            raise;
+          end;
+        end;
+
+      end;
+
+      WriteLn();
+      WriteLn('Action: ', C_ShipActionStrings[best_action]);
+
+      ship.controller.action := best_action;
+      ship.controller.target := best_target;
+      ship.controller.gob_timeout := AI_GOB_TIMEOUT;
+    end
+    else begin
+      ship.controller.gob_timeout -= 1;
+    end;
+
+    try
+      ActionProc := GetAction(ship.controller.action);
+      ActionProc(ship, asteroids, enemy, map, ship.controller.target, rotation, thrust, shooting);
+    except
+      on E: Exception do begin
+        WriteLn('Exception in asShipController.ShipAI when running Action: ' + E.Message);
+        raise;
+      end;
+    end;
   end;
 
   procedure AIArrive(var ship: TShip; const target: Point2D; var rotation: Double; var thrust: Boolean; const wrap: Boolean = True);
@@ -103,8 +170,8 @@ implementation
     speed := VectorMagnitude(ship.vel);
 
     //calculate "accuracy" of ship
-    vel_accuracy := AICalcAccuracy(ship.vel, ship.pos, target);
-    facing_accuracy := AICalcAccuracy(ship.rot, ship.pos, target);
+    vel_accuracy := AICalcAccuracy(ship.vel, ship.pos, target, wrap);
+    facing_accuracy := AICalcAccuracy(ship.rot, ship.pos, target, wrap);
 
     //state machine time!
     cur_state := ship.controller.move_state;
@@ -113,13 +180,13 @@ implementation
     //transitions
     case cur_state of
       smAlign: begin
-        if facing_accuracy > AI_ACCURACY_MIN then
+        if facing_accuracy > AI_SEEK_ACCURACY_MIN then
           cur_state := smSeek
         else if speed > AI_STOP_TARGET_SPEED then
           cur_state := smStop;
       end;
       smSeek: begin
-        if (vel_accuracy < AI_ACCURACY_MIN) then
+        if (vel_accuracy < AI_SEEK_ACCURACY_MIN) then
           cur_state := smStop;
       end;
 
@@ -175,10 +242,9 @@ implementation
 
   procedure AISeek(const ship: TShip; const target: Point2D; var rotation: Double; var thrust: Boolean; const wrap: Boolean);
   begin
-    //first, rotate
     AIAlign(ship, target, rotation, wrap);
-    //then thrust
-    if VectorMagnitude(ship.vel) < AI_SEEK_TARGET_SPEED then begin
+
+    if AISpeedInFacing(ship.rot, ship.vel) < AI_SEEK_TARGET_SPEED then begin
       thrust := True;
     end;
   end;
@@ -191,9 +257,9 @@ implementation
     stop_vector := ship.vel * -1;
     AIAlign(ship, ship.pos + stop_vector, rotation, False);
 
-    accuracy := AICalcAccuracy(ship.rot, ship.pos, ship.pos + stop_vector);
+    accuracy := AICalcAccuracy(ship.rot, ship.pos, ship.pos + stop_vector, False);
 
-    if (accuracy > AI_ACCURACY_MIN) then begin
+    if (accuracy > AI_STOP_ACCURACY_MIN) and (VectorMagnitude(ship.vel) > AI_STOP_MIN_SPEED) then begin
       thrust := True;
     end;
   end;
@@ -207,42 +273,82 @@ implementation
 
     AIAlign(ship, ship.pos + evade_vector, rotation, False);
 
-    accuracy := AICalcAccuracy(ship.rot, ship.pos + evade_vector, evade_vector);
+    accuracy := AICalcAccuracy(ship.rot, ship.pos, ship.pos + evade_vector, False);
 
-    if (accuracy > AI_ACCURACY_MIN) and (VectorMagnitude(ship.vel) < AI_EVADE_TARGET_SPEED) then begin
+    if (accuracy > AI_EVADE_ACCURACY_MIN) and (AISpeedInFacing(ship.rot, ship.vel) < AI_EVADE_TARGET_SPEED) then begin
       thrust := True;
     end;
   end;
 
-  function AIDistToStop(const ship: TShip): Double;
+  procedure AIShoot(const ship: TShip; const target: Point2D; var rotation: Double; var thrust: Boolean; var shooting: Boolean);
+  var
+    accuracy: Double;
+  begin
+    AIAlign(ship, target, rotation, False);
+
+    accuracy := AICalcAccuracy(ship.rot, ship.pos, target, False);
+
+    if (accuracy > AI_SHOOT_ACCURACY_MIN) then begin
+      shooting := True;
+    end;
+  end;
+
+  function AITimeToTurn(const ship: TShip): Double;
   var
     vel_vector: Vector;
     facing_vector: Vector;
     angle: Double;
-    speed: Double;
-    time_to_turn: Double;
-    time_to_stop: Double;
   begin
     vel_vector := UnitVector(ship.vel) * -1;
     facing_vector := UnitVector(VectorFromAngle(ship.rot, 1.0));
 
     angle := CalculateAngle(facing_vector, vel_vector);
-    time_to_turn := abs(angle) / PLAYER_ROTATION_SPEED;
+    result := abs(angle) / PLAYER_ROTATION_SPEED;
+  end;
 
+  function AITimeToStop(const ship: TShip): Double;
+  var
+    speed: Double;
+  begin
     speed := VectorMagnitude(ship.vel);
-    time_to_stop := speed / PLAYER_ACCELERATION;
-
-    result := (time_to_turn + time_to_stop) * speed;
+    result := speed / PLAYER_ACCELERATION;
   end;
 
-  function AICalcAccuracy(const ship_rot: Double; const source_pos, target_pos: Vector): Double; overload;
+  function AIDistToStop(const ship: TShip): Double;
+  var
+    speed: Double;
   begin
-    result := AICalcAccuracy(VectorFromAngle(ship_rot, 1.0), source_pos, target_pos);
+    speed := VectorMagnitude(ship.vel);
+    result := AITimeToTurn(ship) * speed + (0.5 * PLAYER_ACCELERATION * AITimeToStop(ship));
   end;
 
-  function AICalcAccuracy(const ship_vector: Vector; const source_pos, target_pos: Vector): Double; overload;
+  function AICalcAccuracy(const ship_rot: Double; const source_pos, target_pos: Point2D; const wrap: Boolean): Double; overload;
   begin
-    result := DotProduct(UnitVector(ship_vector), VectorFromAngle(CalculateAngleWithWrap(source_pos, target_pos), 1.0));
+    result := AICalcAccuracy(VectorFromAngle(ship_rot, 1.0), source_pos, target_pos, wrap);
+  end;
+
+  function AICalcAccuracy(const ship_vector: Vector; const source_pos, target_pos: Point2D; const wrap: Boolean): Double; overload;
+  var
+    angle: Double;
+    target_vector: Vector;
+  begin
+    if wrap then begin
+      angle := CalculateAngleWithWrap(source_pos, target_pos);
+    end
+    else begin
+      angle := CalculateAngleBetween(source_pos, target_pos);
+    end;
+
+    target_vector := VectorFromAngle(angle, 1.0);
+    result := DotProduct(UnitVector(ship_vector), target_vector);
+  end;
+
+  function AISpeedInFacing(const rot: Double; const vel: Vector): Double;
+  var
+    facing_vector: Vector;
+  begin
+    facing_vector := VectorFromAngle(rot, 1.0);
+    result := DotProduct(facing_vector, UnitVector(vel)) * VectorMagnitude(vel);
   end;
 
 end.

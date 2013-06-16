@@ -465,7 +465,7 @@ interface
     //Preset colours, do not change these values.
     ColorBlue, ColorGreen, ColorRed, ColorWhite, ColorBlack, ColorYellow,
     ColorPink, ColorTurquoise, ColorGrey, ColorMagenta, ColorTransparent,
-    ColorLightGrey: Color;
+    ColorLightGrey, ColorOrange: Color;
 
 //=============================================================================
 implementation
@@ -684,6 +684,7 @@ implementation
       ColorMagenta := RGBAColor(255, 0, 255, 255);
       ColorTransparent := RGBAColor(0, 0, 0, 0);
       ColorLightGrey := RGBAColor(200, 200, 200, 255);
+      ColorOrange := RGBAColor(255, 153, 0, 255);
 
       GUISetForegroundColor(ColorGreen);
       GUISetBackgroundColor(ColorBlack);

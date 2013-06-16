@@ -3,85 +3,107 @@ unit asShip;
 interface
   uses sgTypes, asTypes;
 
-  procedure CreateShip(var player: TShip);
+  procedure CreateShip(var ship: TShip; const kind: TShipKind = sk1ShipAI);
 
-  procedure ResetShip(var player: TShip; var state: TState);
+  procedure ResetShip(var ship: TShip; const asteroids: TAsteroidArray; const enemy: TShip);
 
-  procedure SpawnShip(var player: TShip; var state: TState);
+  procedure SpawnShip(var ship: TShip; const asteroids: TAsteroidArray; const enemy: TShip);
 
-  procedure KillShip(var player: TShip; var state: TState; var debris: TDebrisArray; var notes: TNoteArray);
+  procedure KillShip(var ship: TShip; var debris: TDebrisArray);
 
-  procedure MoveShip(var ship: TShip; const state: TState);
+  procedure MoveShip(var ship: TShip; const state: TState; const asteroids: TAsteroidArray; const enemy: TShip);
 
   procedure DrawShip(const player: TShip);
 
 implementation
-  uses sgCore, sgGeometry, sgInput, asAudio, asConstants, asDraw, sgGraphics, asEffects, asNotes, asOffscreen, asShipController;
+  uses sgCore, sgGeometry, sgInput, asAudio, asConstants, asDraw, sgGraphics, asEffects, asNotes, asOffscreen, asShipController, asPath, math;
 
-  procedure CreateShip(var player: TShip);
+  procedure CreateShip(var ship: TShip; const kind: TShipKind = sk1ShipAI);
   begin
-    player.kind := SK_SHIP_AI;
+    ship.kind := kind;
 
-    player.rad := 9;
+    ship.rad := 9;
 
-    player.pos.x := ScreenWidth() / 2;
-    player.pos.y := ScreenHeight() / 2;
-
-    player.rot := 270;
-
-    player.vel.x := 0;
-    player.vel.y := 0;
-
-    player.last := -1;
-    player.alive := false;
-    player.shields := PLAYER_SHIELD_HIGH;
-    player.respawn := 0;
-    player.int := 0;
-    player.thrust := false;
-    player.controller.move_state := smAlign;
-    player.controller.arrive_state := ssMove;
-    player.controller.pathfind_timeout := 0;
-  end;
-
-  procedure ResetShip(var player: TShip; var state: TState);
-  begin
-    player.pos.x := ScreenWidth() / 2;
-    player.pos.y := ScreenHeight() / 2;
-
-    player.rot := 270;
-
-    player.vel.x := 0;
-    player.vel.y := 0;
-
-    player.last := -1;
-    player.alive := true;
-    player.shields := PLAYER_SHIELD_HIGH;
-    player.int := 0;
-    player.thrust := False;
-
-    state.lives -= 1;
-  end;
-
-  procedure SpawnShip(var player: TShip; var state: TState);
-  begin
-    ResetShip(player,state);
-    player.respawn := PLAYER_RESPAWN_SHOW;
-    state.lives += 1;
-  end;
-
-  procedure KillShip(var player: TShip; var state: TState; var debris: TDebrisArray; var notes: TNoteArray);
-  begin
-    CreateDebris(player,debris);
-    player.alive := false;
-    EndThrusterEffect();
-    if state.lives > 0 then
-    begin
-      CreateNote(notes,'Life Lost',player.pos,player.vel + VectorFromAngle(270,2),ColorRed);
-      player.respawn := PLAYER_RESPAWN_HIGH;
+    if ship.kind = sk2ShipAI then begin
+      ship.pos.x := ScreenWidth() * (3 / 4);
+      ship.color := ColorBlue;
+    end
+    else begin
+      ship.pos.x := ScreenWidth() / 4;
+      ship.color := ColorGreen;
     end;
+
+    ship.pos.y := ScreenHeight() / 2;
+
+    ship.rot := 270;
+
+    ship.vel.x := 0;
+    ship.vel.y := 0;
+
+    ship.last := -1;
+    ship.alive := false;
+    ship.shields := PLAYER_SHIELD_HIGH;
+    ship.respawn := 0;
+    ship.int := 0;
+    ship.thrust := false;
+    ship.kills := 0;
+    ship.deaths := 0;
+
+    ship.controller.move_state := smAlign;
+    ship.controller.arrive_state := ssMove;
+    ship.controller.pathfind_timeout := 0;
+    ship.controller.action := saIdle;
+    ship.controller.gob_timeout := 0;
+    ship.controller.target.x := 0;
+    ship.controller.target.y := 0;
   end;
 
-  procedure MoveShip(var ship: TShip; const state: TState);
+  procedure ResetShip(var ship: TShip; const asteroids: TAsteroidArray; const enemy: TShip);
+  var
+    random_point: Point2D;
+  begin
+    repeat
+      random_point.x := random(ScreenWidth());
+      random_point.y := random(ScreenHeight());
+    until CheckIfSpaceEmpty(random_point, ship.rad, asteroids, enemy);
+    ship.pos := random_point;
+
+    ship.rot := 270;
+
+    ship.vel.x := 0;
+    ship.vel.y := 0;
+
+    ship.last := -1;
+    ship.alive := true;
+    ship.shields := PLAYER_SHIELD_HIGH;
+    ship.int := 0;
+    ship.thrust := False;
+    ship.path := CreateEmptyPath;
+
+    ship.controller.move_state := smAlign;
+    ship.controller.arrive_state := ssMove;
+    ship.controller.pathfind_timeout := 0;
+    ship.controller.action := saIdle;
+    ship.controller.gob_timeout := 0;
+    ship.controller.target.x := 0;
+    ship.controller.target.y := 0;
+  end;
+
+  procedure SpawnShip(var ship: TShip; const asteroids: TAsteroidArray; const enemy: TShip);
+  begin
+    ResetShip(ship, asteroids, enemy);
+    ship.respawn := PLAYER_RESPAWN_SHOW;
+  end;
+
+  procedure KillShip(var ship: TShip; var debris: TDebrisArray);
+  begin
+    CreateDebris(ship, debris);
+    ship.alive := false;
+    EndThrusterEffect();
+    ship.deaths += 1;
+  end;
+
+  procedure MoveShip(var ship: TShip; const state: TState; const asteroids: TAsteroidArray; const enemy: TShip);
   var
     thrust: Boolean;
     rotation: Double;
@@ -89,10 +111,10 @@ implementation
   begin
     thrust := False;
     rotation := 0;
-    if ship.kind = SK_SHIP_PLAYER then
+    if ship.kind = sk1ShipPlayer then
       ShipPlayer(ship, state, rotation, thrust, shooting)
     else
-      ShipAI(ship, rotation, thrust, shooting);
+      ShipAI(ship, asteroids, enemy, state.map, rotation, thrust, shooting);
 
     ship.shooting := shooting;
 
@@ -129,17 +151,19 @@ implementation
   procedure DrawShip(const player: TShip);
   var
     thrusterPoints: Point2DArray;
-    shipColor, thrustColor: Color;
+    shipColor, shipHurtColor, thrustColor: Color;
   begin
-    shipColor := ColorGreen;
-    thrustColor := ColorBlue;
+    shipColor := player.color;
+    shipHurtColor := $01010101 and shipColor;
+
+    thrustColor := ColorRed;
     if (player.respawn > 0) then
     begin
       shipColor += $01000000 * Trunc((0.4 * Cosine((player.respawn mod 20) * 180 / 10) + 0.6) * 255);
       thrustColor += $01000000 * Trunc((0.4 * Cosine((player.respawn mod 20) * 180 / 10) + 0.6) * 255);
     end
     else if (player.shields < PLAYER_SHIELD_HIGH) then
-      shipColor := $01000100 * Trunc((0.5 * Cosine((player.shields mod 20) * 180 / 10) + 0.5) * 255) + $01010000 * Trunc((0.5 * Cosine((player.shields mod 20) * 180 / 10 + 180) + 0.5) * 255);
+      shipColor := shipHurtColor * Trunc((0.5 * Cosine((player.shields mod 20) * 180 / 10) + 0.5) * 255) + $01010000 * Trunc((0.5 * Cosine((player.shields mod 20) * 180 / 10 + 180) + 0.5) * 255);
 
     DrawShape(ShipPoints,player.pos,player.rot,shipColor);
 

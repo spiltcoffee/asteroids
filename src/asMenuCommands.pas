@@ -33,9 +33,10 @@ implementation
     LoadPauseMenu(menu);
 
     CreateShip(player);
-    SpawnShip(player,state);
+    //SpawnShip(player, asteroids, enemy);
 
-    SetupEnemy(enemy);
+    CreateShip(enemy, sk2ShipAI);
+    //SpawnShip(enemy, asteroids, player);
 
     SetLength(asteroids,0);
 
@@ -63,7 +64,7 @@ implementation
 
     CreateShip(player);
 
-    SetupEnemy(enemy);
+    CreateShip(enemy, sk2ShipAI);
 
     SetLength(asteroids,0);
 

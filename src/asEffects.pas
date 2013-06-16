@@ -27,7 +27,7 @@ implementation
     angle: Double;
     point: Point2DArray;
   begin
-    if shooter.kind <> SK_UFO_AI then
+    if shooter.kind <> sk2ShipUFO then
     begin
       SetLength(bullets,Length(bullets) + 1);
       new := High(bullets);
@@ -40,7 +40,7 @@ implementation
       bullets[new].kind := shooter.kind;
       result := true;
     end
-    else if shooter.kind = SK_UFO_AI then
+    else if shooter.kind = sk2ShipUFO then
     begin
       result := false;
       time := BULLET_START;
@@ -49,6 +49,9 @@ implementation
         time -= 1;
       end;
       time += 1; //go forward one again, because we just found the point in time we can't hit them
+
+      //UGH! why did i write such ugly code! - future spiltcoffee
+
       if time <= BULLET_START then
       begin
         SetLength(bullets,Length(bullets) + 1);
@@ -128,7 +131,7 @@ implementation
     nextPoint: Point2D;
     drawingPoints: Point2DArray;
   begin
-    if ship.kind <> SK_UFO_AI then
+    if ship.kind in [sk1ShipPlayer, sk1ShipAI, sk2ShipAI] then
     begin
       drawingPoints := CopyRotateTranslate(ShipPoints,ship.pos,ship.rot); //so we don't modify the original array of points
 
@@ -155,10 +158,10 @@ implementation
 
         debris[new].life := DEBRIS_START;
         debris[new].kind := Line;
-        debris[new].col := ColorGreen;
+        debris[new].col := ship.color;
       end;
     end
-    else if ship.kind = SK_UFO_AI then
+    else if ship.kind = sk2ShipUFO then
     begin
       for i := 1 to 2 do
       begin

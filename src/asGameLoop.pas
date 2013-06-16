@@ -49,11 +49,11 @@ implementation
     end
     else if KeyTyped(VK_BACKQUOTE) then begin
       if (KeyDown(VK_LMETA) or KeyDown(VK_RMETA)) then begin
-        if ship.kind = SK_SHIP_PLAYER then begin
-          ship.kind := SK_SHIP_AI;
+        if ship.kind = sk1ShipPlayer then begin
+          ship.kind := sk1ShipAI;
         end
         else begin
-          ship.kind := SK_SHIP_PLAYER;
+          ship.kind := sk1ShipPlayer;
         end;
       end
       else begin
@@ -81,7 +81,8 @@ implementation
     CreateShip(player);
     player.path := CreateEmptyPath;
 
-    SetupEnemy(enemy);
+    CreateShip(enemy, sk2ShipAI);
+    enemy.path := CreateEmptyPath;
 
     SetLength(asteroids,0);
 
@@ -98,37 +99,40 @@ implementation
     if not state.paused then begin
       if (player.respawn > 0) then
         player.respawn -= 1;
+      if (enemy.respawn > 0) then
+        enemy.respawn -= 1;
 
-      if not player.alive and state.playing then begin
+      if state.playing then begin
 
-        if (state.lives > 0) and (player.respawn < PLAYER_RESPAWN_SHOW) then begin
+        if not player.alive and (player.respawn < PLAYER_RESPAWN_SHOW) then begin
           PlayRespawnEffect(state);
-          ResetShip(player,state);
-        end
-        else if (state.lives = 0) and (player.respawn = 0) then begin
-          StartMenuCommand(GameOver,state,menu);
+          SpawnShip(player, asteroids, enemy);
+        end;
+
+        if not enemy.alive and (enemy.respawn < PLAYER_RESPAWN_SHOW) then begin
+          PlayRespawnEffect(state);
+          SpawnShip(enemy, asteroids, player);
         end;
 
       end;
 
-      while NeedMoreAsteroids(state.score, asteroids) do
+      while NeedMoreAsteroids(state.score, asteroids) do begin
         CreateAsteroid(asteroids,player,true);
+      end;
 
       if player.alive and (player.int = 0) and player.shooting then begin
         PlayBulletEffect(state);
         player.int := PLAYER_BULLET_INTERVAL;
-        CreateBullet(bullets,player,player); //second player is kinda pointless, but I got nothing else to put there!
+        CreateBullet(bullets,player,enemy);
       end;
       player.shooting := False;
 
-      if not enemy.alive and (state.enemylives > 0) then begin
-        CreateEnemy(enemy,player,asteroids);
-      end;
-
-      if enemy.alive and player.alive and (enemy.int = 0) and CreateBullet(bullets,enemy,player) then begin
+      if enemy.alive and (enemy.int = 0) and enemy.shooting then begin
         PlayBulletEffect(state);
-        enemy.int := ENEMY_BULLET_INTERVAL;
+        enemy.int := PLAYER_BULLET_INTERVAL;
+        CreateBullet(bullets,enemy,player);
       end;
+      enemy.shooting := False;
 
       if state.playing then begin
         ResetMap(state.map);
@@ -156,18 +160,20 @@ implementation
         begin
           PlayShipExplodeEffect(state);
           CreateSparks(debris,4,FindCollisionPoint(player.pos,player.rad,enemy.pos,ENEMY_RADIUS_OUT));
-          KillShip(player,state,debris,notes);
-        end
-        else if (player.respawn = 0) then
-          PlayAlarmEffect(state);
+          KillShip(player, debris);
+          enemy.kills += 1;
+        end;
 
-        if (enemy.shields <= 0) then
+        if (enemy.shields < 0) then
         begin
           PlayShipExplodeEffect(state);
-          EndEnemyEffect();
           CreateSparks(debris,4,FindCollisionPoint(player.pos,player.rad,enemy.pos,ENEMY_RADIUS_OUT));
-          KillEnemy(enemy,state,debris,notes);
+          KillShip(enemy, debris);
+          player.kills += 1;
         end;
+
+        if (player.respawn = 0) or (enemy.respawn = 0) then
+          PlayAlarmEffect(state);
       end;
 
       ///                 ///
@@ -293,86 +299,6 @@ implementation
 
       state.ignoreCollision := ignoreCollision;
 
-      ///                 ///
-      //ASTEROID COLLISIONS//
-      ///                 ///
-
-      //asteroid collide asteroid
-
-{   try
-      while i < Length(asteroids) - 1 do
-      i := 0;
-      begin
-        j := i + 1;
-        while j < Length(asteroids) do
-        begin
-          if PointPointDistance(asteroids[i].pos, asteroids[j].pos) <= (asteroids[i].rad + asteroids[j].rad) then
-          begin
-            if (asteroids[i].last <> j) and (asteroids[j].last <> i) then
-            begin
-              //check asteroid[i] to make sure it won't instantly collide with it's last asteroid
-              if (asteroids[i].last > -1) and (PointPointDistance(asteroids[i].pos, asteroids[asteroids[i].last].pos) <= (asteroids[i].rad + asteroids[asteroids[i].last].rad)) then
-              begin
-                last := asteroids[i].last; //keep it for later
-                DestroyTwoAsteroids(asteroids, i, last, FindCollisionPoint(asteroids[i].pos,asteroids[i].rad,asteroids[last].pos,asteroids[last].rad), debris);
-
-                //I could explain what this does, or you could just nod, smile, and accept that this prevents access violations from occurring
-                if asteroids[asteroids[last].last].last = last then
-                  asteroids[asteroids[last].last].last := -1;
-
-
-                if i > last then //move back one if the other one we removed was before i
-                  i -= 1;
-
-                //start the next loop of j
-                j := i;
-              end
-              //check asteroid[j] to make sure it won't instantly collide with it's last asteroid
-              else if (asteroids[j].last > -1) and (PointPointDistance(asteroids[j].pos, asteroids[asteroids[j].last].pos) <= (asteroids[j].rad + asteroids[asteroids[j].last].rad)) then
-              begin
-                last := asteroids[j].last;
-                DestroyTwoAsteroids(asteroids, j, last, FindCollisionPoint(asteroids[j].pos,asteroids[j].rad,asteroids[last].pos,asteroids[last].rad), debris);
-
-                //And again. Nod, smile, accept. Easy :)
-                if asteroids[asteroids[last].last].last = last then
-                  asteroids[asteroids[last].last].last := -1;
-
-                if i > last then //move back one if the other one we removed was before i
-                  i -= 1;
-                if j > last then //move back one if the other one we removed was before j
-                  i -= 1;
-              end
-              else
-              begin
-                Collide(asteroids[i],asteroids[j]);
-                PlayCollisionEffect(state);
-                CreateSparks(debris,4,FindCollisionPoint(asteroids[i].pos,asteroids[i].rad,asteroids[j].pos,asteroids[j].rad));
-                asteroids[i].last := j;
-                asteroids[j].last := i;
-              end
-            end
-          end
-          else if (asteroids[i].last = j) and (asteroids[j].last = i) then
-          begin
-            asteroids[i].last := -1;
-            asteroids[j].last := -1;
-          end;
-          j += 1;
-        end;
-        i += 1;
-      end;
-    except
-      on E: Exception do
-      begin
-        WriteLn('Exception Caught! (You silly duffer!)');
-        WriteLn('i = ' + IntToStr(i));
-        WriteLn('i.last = ' + IntToStr(asteroids[i].last));
-        WriteLn('j = ' + IntToStr(j));
-        WriteLn('j.last = ' + IntToStr(asteroids[j].last));
-      end;
-    end;
-}
-
       //asteroid collide player, asteroid collide enemy, asteroid collide bullet
       i := 0;
       while i < Length(asteroids) do
@@ -389,7 +315,7 @@ implementation
             begin
               PlayShipExplodeEffect(state);
               CreateSparks(debris,4,FindCollisionPoint(asteroids[i].pos,asteroids[i].rad,player.pos,player.rad));
-              KillShip(player,state,debris,notes);
+              KillShip(player, debris);
             end
             else if (player.respawn = 0) then
               PlayAlarmEffect(state);
@@ -408,13 +334,14 @@ implementation
             Collide(asteroids[i],enemy);
             PlayCollisionEffect(state);
             CreateSparks(debris,4,FindCollisionPoint(asteroids[i].pos,asteroids[i].rad,enemy.pos,ENEMY_RADIUS_OUT));
-            if (enemy.shields <= 0) then
+            if (enemy.shields < 0) then
             begin
               PlayShipExplodeEffect(state);
-              EndEnemyEffect();
               CreateSparks(debris,4,FindCollisionPoint(asteroids[i].pos,asteroids[i].rad,enemy.pos,ENEMY_RADIUS_OUT));
-              KillEnemy(enemy,debris);
-            end;
+              KillShip(enemy, debris);
+            end
+            else if (enemy.respawn = 0) then
+              PlayAlarmEffect(state);
           end;
         end
         else if (enemy.last = i) then
@@ -428,10 +355,7 @@ implementation
           if (PointPointDistance(asteroids[i].pos, bullets[j].pos) <= (asteroids[i].rad + BULLET_RADIUS)) and (bullets[j].life > 0) then
           begin
             PlayAsteroidExplodeEffect(state);
-            if bullets[j].kind = SK_SHIP_PLAYER then
-              DestroyAsteroid(asteroids,i,bullets[j].pos,state,debris,notes)
-            else
-              DestroyAsteroid(asteroids,i,bullets[j].pos,debris);
+            DestroyAsteroid(asteroids,i,bullets[j].pos,debris);
             CreateSparks(debris,8,bullets[j].pos);
             Remove(bullets,j);
             i -= 1;
@@ -447,33 +371,39 @@ implementation
       i := 0;
       while i < Length(bullets) do
       begin
-        if player.alive and (PointPointDistance(player.pos, bullets[i].pos) <= (player.rad + BULLET_RADIUS)) and (bullets[i].life > 0) and (bullets[i].kind <> SK_SHIP_PLAYER) then
+        if player.alive and (PointPointDistance(player.pos, bullets[i].pos) <= (player.rad + BULLET_RADIUS)) and (bullets[i].life > 0) and (bullets[i].kind <> player.kind) then
         begin
           PlayCollisionEffect(state);
           if (player.respawn = 0) then
-            player.shields -= Trunc(PLAYER_SHIELD_HIGH*0.50);
+            player.shields -= Trunc(PLAYER_SHIELD_HIGH * BULLET_DAMAGE);
           if (player.shields < 0) then
           begin
             PlayShipExplodeEffect(state);
-            KillShip(player,state,debris,notes);
+            KillShip(player, debris);
+            enemy.kills += 1;
           end
           else if (player.respawn = 0) then
             PlayAlarmEffect(state);
           CreateSparks(debris,8,bullets[i].pos);
           Remove(bullets,i);
-          ShakeScreen();
+          if player.kind = sk1ShipPlayer then begin
+            ShakeScreen();
+          end;
           i -= 1;
         end
-        else if enemy.alive and (PointPointDistance(enemy.pos, bullets[i].pos) <= (ENEMY_RADIUS_OUT + BULLET_RADIUS)) and (bullets[i].life > 0) and (bullets[i].kind = SK_SHIP_PLAYER) then
+        else if enemy.alive and (PointPointDistance(enemy.pos, bullets[i].pos) <= (ENEMY_RADIUS_OUT + BULLET_RADIUS)) and (bullets[i].life > 0) and (bullets[i].kind <> enemy.kind) then
         begin
+          PlayCollisionEffect(state);
           if (enemy.respawn = 0) then
-            enemy.shields -= Trunc(ENEMY_SHIELD_HIGH*0.99);
+            enemy.shields -= Trunc(ENEMY_SHIELD_HIGH * BULLET_DAMAGE);
           if (enemy.shields < 0) then
           begin
             PlayShipExplodeEffect(state);
-            EndEnemyEffect();
-            KillEnemy(enemy,state,debris,notes);
-          end;
+            KillShip(enemy, debris);
+            player.kills += 1;
+          end
+          else if (enemy.respawn = 0) then
+            PlayAlarmEffect(state);
           CreateSparks(debris,8,bullets[i].pos);
           Remove(bullets,i);
           i -= 1;
@@ -497,8 +427,6 @@ implementation
   procedure MoveGame(var state: TState; var menu: TMenu; var player, enemy: TShip; var asteroids: TAsteroidArray; var bullets: TBulletArray; var debris: TDebrisArray; var notes: TNoteArray);
   var
     i: Integer;
-    position: Point2D;
-    map_pos: Point2D;
   begin
     UpdateState(state,player,notes);
 
@@ -508,45 +436,16 @@ implementation
     if not state.paused then begin
       if state.playing then begin
         UpdateMap(state.map, asteroids);
-
-        if player.controller.pathfind_timeout > 0 then begin
-          player.controller.pathfind_timeout -= 1;
-        end
-        else begin
-
-          if not PathStillValid(player.path, state.map) then begin
-            player.path := FindPath(state.map, player.pos, PathEnd(player.path));
-            player.controller.pathfind_timeout += 30;
-          end
-          else begin
-
-            i := 0;
-            while PathFinished(player.path) and (i < 5) do begin
-              position.x := random(state.res.width);
-              position.y := random(state.res.height);
-              map_pos := MapPosition(position);
-              if state.map[trunc(map_pos.x), trunc(map_pos.y)] > 256 then begin
-                player.path := CreateEmptyPath;
-                i += 1;
-              end
-              else begin
-                player.path := FindPath(state.map, player.pos, position);
-                i += 5;
-                player.controller.pathfind_timeout += 30;
-              end;
-            end;
-
-          end;
-        end;
       end;
 
       if player.alive then begin
+        MoveShip(player, state, asteroids, enemy);
         UpdatePath(player.path, player.pos);
-        MoveShip(player,state);
       end;
 
       if enemy.alive then begin
-        MoveEnemy(enemy,state,player,asteroids);
+        MoveShip(enemy, state, asteroids, player);
+        UpdatePath(enemy.path, enemy.pos);
       end;
 
       for i := 0 to High(asteroids) do begin
@@ -599,6 +498,10 @@ implementation
   begin
     ClearScreen();
 
+    if state.debug then begin
+      DrawMap(state.map, state.res);
+    end;
+
     for i := 0 to High(notes) do begin
       DrawNote(notes[i]);
     end;
@@ -606,12 +509,17 @@ implementation
     if player.alive then begin
       DrawShip(player);
       if state.debug then begin
-        DrawPath(player.path);
+        DrawPath(player);
+        DrawCircle(player.color, player.controller.target, 10);
       end;
     end;
 
     if enemy.alive then begin
-      DrawEnemy(enemy);
+      DrawShip(enemy);
+      if state.debug then begin
+        DrawPath(enemy);
+        DrawCircle(enemy.color, enemy.controller.target, 10);
+      end;
     end;
 
     for i := 0 to High(asteroids) do begin
@@ -630,10 +538,7 @@ implementation
       DrawMenu(menu,state);
     end;
 
-    DrawState(state);
-    if state.debug then begin
-      DrawMap(state.map, state.res);
-    end;
+    DrawState(state, player, enemy);
   end;
 
 end.

@@ -19,7 +19,7 @@ implementation
 
   procedure SetupEnemy(var enemy: TShip);
   begin
-    enemy.kind := SK_UFO_AI;
+    enemy.kind := sk2ShipUFO;
     enemy.rad := ENEMY_RADIUS_OUT;
     enemy.last := -1;
     enemy.alive := false;

@@ -5,7 +5,8 @@ interface
 
   function ProximityCheck(fromPoint, toPoint: Point2D; const dist: Double): Boolean;
 
-  function CheckIfSpaceEmpty(const asteroids: TAsteroidArray; const cur: Integer): Boolean;
+  function CheckIfSpaceEmpty(const position: Point2D; const radius: Double; const asteroids: TAsteroidArray; const enemy: TShip): Boolean; overload;
+  function CheckIfSpaceEmpty(const asteroids: TAsteroidArray; const cur: Integer): Boolean; overload;
 
   function CalculateDistWithWrap(fromPoint, toPoint: Point2D): Double;
 
@@ -52,7 +53,25 @@ implementation
       result := false;
   end;
 
-  function CheckIfSpaceEmpty(const asteroids: TAsteroidArray; const cur: Integer): Boolean;
+  function CheckIfSpaceEmpty(const position: Point2D; const radius: Double; const asteroids: TAsteroidArray; const enemy: TShip): Boolean; overload;
+  var
+    i: Integer;
+  begin
+    result := True;
+    if not ProximityCheck(enemy.pos, position, enemy.rad + radius) then begin
+      result := False;
+    end
+    else begin
+      for i := Low(asteroids) to High(asteroids) do begin
+        if not ProximityCheck(asteroids[i].pos, position, asteroids[i].rad + radius) then begin
+          result := False;
+          break;
+        end;
+      end;
+    end;
+  end;
+
+  function CheckIfSpaceEmpty(const asteroids: TAsteroidArray; const cur: Integer): Boolean; overload;
   var
     i: Integer;
   begin

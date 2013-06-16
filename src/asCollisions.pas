@@ -76,7 +76,7 @@ implementation
     result.pos := ship.pos;
     result.vel := ship.vel;
     result.rotspeed := 0;
-    if ship.kind <> SK_UFO_AI then
+    if ship.kind <> sk2ShipUFO then
       result.mass := PLAYER_MASS
     else
       result.mass := ENEMY_MASS;
@@ -163,7 +163,7 @@ implementation
     if ship.shields > 0 then
       ship.vel := object2.vel;
 
-    if ship.kind = SK_SHIP_PLAYER then
+    if ship.kind = sk1ShipPlayer then
       ShakeScreen();
   end;
 

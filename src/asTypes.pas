@@ -113,10 +113,11 @@ type
       angle: Double;
     end;
 
-    ShipKind = (
-      SK_SHIP_PLAYER,
-      SK_SHIP_AI,
-      SK_UFO_AI
+    TShipKind = (
+      sk1ShipPlayer,
+      sk1ShipAI,
+      sk2ShipUFO,
+      sk2ShipAI
     );
 
     TMoveState = (
@@ -143,14 +144,38 @@ const
     );
 
 type
+
+    TShipAction = (
+      saMoveToEnemy,
+      saEvadeEnemy,
+      saEvadeAsteroid,
+      saShootEnemy,
+      saShootAsteroid,
+      saIdle
+    );
+
+const
+    C_ShipActionStrings: array[TShipAction] of String = (
+      'Move To Enemy',
+      'Evade Enemy',
+      'Evade Asteroid',
+      'Shoot Enemy',
+      'Shoot Asteroid',
+      'Idle'
+    );
+
+type
     TController = record
       move_state: TMoveState;
       arrive_state: TArriveState;
       pathfind_timeout: Integer;
+      gob_timeout: Integer;
+      target: Point2D;
+      action: TShipAction;
     end;
 
     TShip = record
-      kind: ShipKind;
+      kind: TShipKind;
       point: Point2DArray;
       rot: Double;
       pos: Point2D; //position
@@ -165,6 +190,9 @@ type
       controller: TController;
       path: TPath;
       shooting: Boolean;
+      color: Integer;
+      kills: Integer;
+      deaths: Integer;
     end;
 
     TAsteroid = record
@@ -182,7 +210,7 @@ type
       pos: Point2D;
       vel: Vector;
       life: Integer;
-      kind: ShipKind;
+      kind: TShipKind;
     end;
     TBulletArray = array of TBullet;
 
@@ -218,6 +246,9 @@ type
       mass: Double;
       damage: Integer;
     end;
+
+    TActionUtilFunc = function (const ship: TShip; const asteroids: TAsteroidArray; const enemy: TShip; const map: TMap; var target: Point2D): Integer;
+    TActionProc = procedure (var ship: TShip; const asteroids: TAsteroidArray; const enemy: TShip; const map: TMap; const target: Point2D; var rotation: Double; var thrust: Boolean; var shooting: Boolean);
 
 implementation
 

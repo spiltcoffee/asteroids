@@ -11,7 +11,7 @@ interface
   procedure Remove(var array_in: TCollisionArray; index: integer); overload;
 
 implementation
-  
+
   procedure Remove(var array_in: TAsteroidArray; index: integer); overload;
   var
     i: integer;
@@ -65,5 +65,10 @@ implementation
       array_in[i] := array_in[i+1];
     SetLength(array_in,Length(array_in)-1);
   end;
-  
+
 end.
+
+//______________________________________________________//
+//                                                      //
+// SwinGame Asteroids - Copyright SpiltCoffee 2010-2013 //
+//______________________________________________________//

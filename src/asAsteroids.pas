@@ -2,17 +2,17 @@ unit asAsteroids;
 
 interface
   uses sgTypes, asTypes;
-  
+
   procedure CreateAsteroid(var asteroids: TAsteroidArray; const player: TShip; offscreen: Boolean = false);
 
   procedure DestroyAsteroid(var asteroids: TAsteroidArray; const del: Integer; const collision: Point2D; var debris: TDebrisArray); overload;
   procedure DestroyAsteroid(var asteroids: TAsteroidArray; const del: Integer; const collision: Point2D; var state: TState; var debris: TDebrisArray; var notes: TNoteArray); overload;
   procedure DestroyTwoAsteroids(var asteroids: TAsteroidArray; const del1: Integer; const del2: Integer; const collision: Point2D; var debris: TDebrisArray);
-  
+
   procedure MoveAsteroid(var asteroid: TAsteroid);
-  
+
   procedure DrawAsteroid(asteroid: TAsteroid);
-  
+
 implementation
   uses sgCore, sgGeometry, asConstants, asDraw, asEffects, asExtras, asNotes, asOffscreen, asState, Math;
 
@@ -37,9 +37,9 @@ implementation
       result.point[i].y := Trunc(amplitude * Sine((i / Length(result.point)) * 360 + offset));
       result.rad := Max(result.rad, amplitude);
     end;
-    
+
     result.vel := VectorFromAngle(Rnd(180),(Rnd() - 0.5) * ASTEROID_SPEED_MULTIPLIER);
-    
+
     result.rot.angle := 0;
     result.rot.speed := (Rnd() - 1 / 2) * 2 * ASTEROID_MAXROTATION;
     result.last := -1;
@@ -52,7 +52,7 @@ implementation
     SetLength(asteroids,Length(asteroids) + 1);
     new := High(asteroids);
     asteroids[new] := GenerateAsteroid();
-    
+
     attempts := ASTEROID_MAXCREATION;
     repeat
       attempts -= 1;
@@ -101,7 +101,7 @@ implementation
 
     DestroyAsteroid(asteroids,del,collision,debris);
   end;
-  
+
   //Destroy the asteroid that's further in the array first to prevent the other from shifting position.
   //I'm lazy, what's new?
   procedure DestroyTwoAsteroids(var asteroids: TAsteroidArray; const del1: Integer; const del2: Integer; const collision: Point2D; var debris: TDebrisArray);
@@ -122,7 +122,7 @@ implementation
       asteroid.rot.speed := MAX_ROTATION
     else if asteroid.rot.speed < -MAX_ROTATION then
       asteroid.rot.speed := -MAX_ROTATION;
-    
+
     asteroid.rot.angle += asteroid.rot.speed;
     if asteroid.rot.angle < 0 then
       asteroid.rot.angle += 360
@@ -136,3 +136,8 @@ implementation
   end;
 
 end.
+
+//______________________________________________________//
+//                                                      //
+// SwinGame Asteroids - Copyright SpiltCoffee 2010-2013 //
+//______________________________________________________//

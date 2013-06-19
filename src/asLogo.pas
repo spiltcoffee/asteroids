@@ -12,7 +12,7 @@ implementation
     //isStep: Boolean;
     isPaused: Boolean;
     isSkip: Boolean;
-    
+
     procedure InnerProcessEvents();
     begin
       ProcessEvents();
@@ -23,17 +23,17 @@ implementation
       if WindowCloseRequested() or KeyDown(vk_Escape) then isSkip := true;
     end;
   begin
-    
+
     isPaused := false;
     isSkip := false;
 
     XCenter := ScreenWidth() div 2;
     YCenter := ScreenHeight() div 2;
-    
+
     LoadResourceBundle('mylogo.txt', False);
 
     ClearScreen();
-    
+
     i := 1;
     while isPaused or (i < 60) do
     begin
@@ -54,9 +54,9 @@ implementation
       RefreshScreen(60);
       if isSkip then break;
     end;
-    
+
     ClearScreen();
-    
+
     i := 1;
     while isPaused or (i < 45) do
     begin
@@ -69,3 +69,8 @@ implementation
     end;
   end;
 end.
+
+//______________________________________________________//
+//                                                      //
+// SwinGame Asteroids - Copyright SpiltCoffee 2010-2013 //
+//______________________________________________________//

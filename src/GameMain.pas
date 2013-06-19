@@ -1,10 +1,3 @@
-//!!TODO!! (higher = more important)
-//release final version to public - you're done!! :D
-
-//!!ORDER!!
-//Instances: state {p}, menu {p}, note {d}, player, enemy, asteroid, bullet, debris, note {p}, menu {d}, state {d}
-//Procedures: Process Input, Create, Collide, Destroy, Move, Draw, Refresh Screen (only do first and last two when paused :D)
-
 program GameMain;
 {$IFNDEF UNIX} {$r GameLauncher.res} {$ENDIF}
 uses sgCore, sgResources, asAudio, asConstants, asGameLoop, asLogo, asMenuCommands, asTypes, SysUtils;
@@ -49,3 +42,8 @@ end;
 begin
   Main();
 end.
+
+//______________________________________________________//
+//                                                      //
+// SwinGame Asteroids - Copyright SpiltCoffee 2010-2013 //
+//______________________________________________________//

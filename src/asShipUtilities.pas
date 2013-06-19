@@ -78,7 +78,7 @@ implementation
 
   function UtilMoveToEnemy(const ship: TShip; const asteroids: TAsteroidArray; const enemy: TShip; const map: TMap; var target: Point2D): Integer;
   begin
-    Result := trunc(PointPointDistance(ship.pos, enemy.pos)) * 3;
+    Result := trunc(PointPointDistance(ship.pos, enemy.pos)) * 3; //no real "urgency", just closer you get, more urgent utility becomes
     target := CurrentPoint(ship.path);
   end;
 
@@ -113,7 +113,7 @@ implementation
     bullet_future_range := trunc(BULLET_SPEED * BULLET_START);
     target_future := ship.pos + (ship.vel * BULLET_START);
     target_future_range := PointPointDistance(target_future, bullet_future);
-    if target_future_range < (bullet_future_range + AI_EVADE_ENEMY_BUFFER) then begin //in range!
+    if target_future_range < (bullet_future_range + AI_EVADE_ENEMY_BUFFER) then begin //in range, more urgentt
       Result := trunc(target_future_range * 4);
       if enemy.int = 0 then begin
         Result -= trunc(target_future_range); //enemy can shoot, utility more urgent
@@ -121,7 +121,7 @@ implementation
           Result -= trunc(target_future_range); //enemy can shoot, utility more urgent
       end;
       end;
-      Result += trunc(target_future_range * AICalcAccuracy(ship.rot, ship.pos, target, False)); //increases if facing enemy, decreases if back to enemy
+      Result += trunc(target_future_range * AICalcAccuracy(ship.rot, ship.pos, target, False)); //less urgent if facing enemy, more urgent if back to enemy
     end
     else begin
       Result := 100000;
@@ -172,7 +172,7 @@ implementation
     end;
 
     if found then begin
-      Result := trunc(PointPointDistance(ship.pos, target)) * 3;
+      Result := trunc(PointPointDistance(ship.pos, target)) * 3; //collision imminent, utility more urgent
     end
     else begin
       Result := 100000;
@@ -232,40 +232,40 @@ implementation
     bullet_future_range: Integer;
     target_future_range: Double;
   begin
-    time_to_stop := Max(AITimeToTurn(ship) + AITimeToStop(ship) + AI_EVADE_BUFFER, AI_EVADE_TIME_MIN);
-    dist_to_stop := Max(AIDistToStop(ship) + VectorMagnitude(ship.vel) * AI_EVADE_BUFFER, AI_EVADE_DIST_MIN);
+    Result := 100000;
+    if ship.int = 0 then begin
+      time_to_stop := Max(AITimeToTurn(ship) + AITimeToStop(ship) + AI_EVADE_BUFFER, AI_EVADE_TIME_MIN);
+      dist_to_stop := Max(AIDistToStop(ship) + VectorMagnitude(ship.vel) * AI_EVADE_BUFFER, AI_EVADE_DIST_MIN);
 
-    found := False;
-    for time := 0 to trunc(time_to_stop/AI_EVADE_STEP) do begin
-      for i := Low(asteroids) to High(asteroids) do begin
+      found := False;
+      for time := 0 to trunc(time_to_stop/AI_EVADE_STEP) do begin
+        for i := Low(asteroids) to High(asteroids) do begin
 
-        if PointPointDistance(ship.pos, asteroids[i].pos) <= dist_to_stop then begin
-          ship_future := ship.pos + ship.vel * (time * AI_EVADE_STEP);
-          asteroid_future := asteroids[i].pos + asteroids[i].vel * (time * AI_EVADE_STEP);
-          if PointPointDistance(ship_future, asteroid_future) < (ship.rad + asteroids[i].rad) then
-          begin
-            target := FindCollisionPoint(ship_future, ship.rad, asteroid_future, asteroids[i].rad);
-            found := True;
-            Break;
+          if PointPointDistance(ship.pos, asteroids[i].pos) <= dist_to_stop then begin
+            ship_future := ship.pos + ship.vel * (time * AI_EVADE_STEP);
+            asteroid_future := asteroids[i].pos + asteroids[i].vel * (time * AI_EVADE_STEP);
+            if PointPointDistance(ship_future, asteroid_future) < (ship.rad + asteroids[i].rad) then
+            begin
+              target := FindCollisionPoint(ship_future, ship.rad, asteroid_future, asteroids[i].rad);
+              found := True;
+              Break;
+            end;
+
           end;
+        end;
 
+        if found then begin
+          Break;
         end;
       end;
 
-      if found then begin
-        Break;
-      end;
-    end;
-
-    if found and (time * AI_EVADE_STEP < BULLET_START) then begin
-      bullet_future := ship.pos + (ship.vel * time * AI_EVADE_STEP);
-      bullet_future_range := trunc(BULLET_SPEED * time * AI_EVADE_STEP);
-      target := asteroids[i].pos + asteroids[i].vel * time * AI_EVADE_STEP;
-      target_future_range := PointPointDistance(target, bullet_future);
-      Result := trunc(target_future_range * 2 + (-1 * AICalcAccuracy(ship.rot, ship.pos, target, False)) * AI_SHOOT_ACCURACY_FACTOR);
-    end
-    else begin
-      Result := 100000;
+      if found and (time * AI_EVADE_STEP < BULLET_START) then begin
+        bullet_future := ship.pos + (ship.vel * time * AI_EVADE_STEP);
+        bullet_future_range := trunc(BULLET_SPEED * time * AI_EVADE_STEP);
+        target := asteroids[i].pos + asteroids[i].vel * time * AI_EVADE_STEP;
+        target_future_range := PointPointDistance(target, bullet_future);
+        Result := trunc(target_future_range * 2 + (-1 * AICalcAccuracy(ship.rot, ship.pos, target, False)) * AI_SHOOT_ACCURACY_FACTOR);
+      end
     end;
   end;
 
@@ -289,3 +289,8 @@ implementation
   end;
 
 end.
+
+//______________________________________________________//
+//                                                      //
+// SwinGame Asteroids - Copyright SpiltCoffee 2010-2013 //
+//______________________________________________________//

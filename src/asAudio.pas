@@ -9,7 +9,7 @@ interface
   procedure StartMusic();
   procedure EndMusic();
   procedure UpdateMusic(const state: TState);
-  
+
   procedure StopAllSoundEffects();
 
   procedure PlayAsteroidExplodeEffect(const state: Tstate);
@@ -21,15 +21,15 @@ interface
   procedure PlayCollisionEffect(const state: TState);
 
   procedure PlayShipExplodeEffect(const state: Tstate);
-  
+
   procedure PlayRespawnEffect(const state: Tstate);
 
   procedure StartThrusterEffect(const state: TState);
   procedure EndThrusterEffect();
-  
+
   procedure StartEnemyEffect(const state: TState);
   procedure EndEnemyEffect();
-  
+
   procedure PlayMenuSelectEffect(const state: TState);
   procedure PlayMenuChangeEffect(const state: TState);
 
@@ -71,26 +71,26 @@ implementation
   begin
     if SoundEffectPlaying(SoundEffectNamed('asAsteroidExplode')) then
       StopSoundEffect(SoundEffectNamed('asAsteroidExplode'));
-    
+
     if SoundEffectPlaying(SoundEffectNamed('asAlarm')) then
       StopSoundEffect(SoundEffectNamed('asAlarm'));
-    
+
     if SoundEffectPlaying(SoundEffectNamed('asBullet')) then
       StopSoundEffect(SoundEffectNamed('asBullet'));
-    
+
     for i := 1 to 6 do if SoundEffectPlaying(SoundEffectNamed('asCollision'+IntToStr(i))) then
       StopSoundEffect(SoundEffectNamed('asCollision'+IntToStr(i)));
-    
+
     if SoundEffectPlaying(SoundEffectNamed('asEnemy')) then
       StopSoundEffect(SoundEffectNamed('asEnemy'));
-    
+
     if SoundEffectPlaying(SoundEffectNamed('asShipExplode')) then
       StopSoundEffect(SoundEffectNamed('asShipExplode'));
-    
+
     if SoundEffectPlaying(SoundEffectNamed('asThruster')) then
       StopSoundEffect(SoundEffectNamed('asThruster'));
   end;
-  
+
   procedure PlayAsteroidExplodeEffect(const state: TState);
   begin
     PlaySoundEffect(SoundEffectNamed('asAsteroidExplode'),state.sfxvolume/100);
@@ -117,7 +117,7 @@ implementation
   begin
     PlaySoundEffect(SoundEffectNamed('asShipExplode'),state.sfxvolume/100);
   end;
-  
+
   procedure PlayRespawnEffect(const state: TState);
   begin
     PlaySoundEffect(SoundEffectNamed('asRespawn'),state.sfxvolume/100);
@@ -134,7 +134,7 @@ implementation
     if SoundEffectPlaying(SoundEffectNamed('asThruster')) then
       StopSoundEffect(SoundEffectNamed('asThruster'));
   end;
-  
+
   procedure StartEnemyEffect(const state: TState);
   begin
     if not SoundEffectPlaying(SoundEffectNamed('asEnemy')) then
@@ -146,7 +146,7 @@ implementation
     if SoundEffectPlaying(SoundEffectNamed('asEnemy')) then
       StopSoundEffect(SoundEffectNamed('asEnemy'));
   end;
-  
+
   procedure PlayMenuSelectEffect(const state: TState);
   begin
     PlaySoundEffect(SoundEffectNamed('asMenuSelect'),state.sfxvolume/100);
@@ -156,5 +156,10 @@ implementation
   begin
     PlaySoundEffect(SoundEffectNamed('asMenuChange'),state.sfxvolume/100);
   end;
-  
+
 end.
+
+//______________________________________________________//
+//                                                      //
+// SwinGame Asteroids - Copyright SpiltCoffee 2010-2013 //
+//______________________________________________________//

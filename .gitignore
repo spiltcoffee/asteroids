@@ -1,4 +1,5 @@
 *.ppu
 *.o
 tmp
+out
 Trace.log

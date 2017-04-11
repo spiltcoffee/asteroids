@@ -21,14 +21,14 @@ APP_PATH=`cd "$APP_PATH"; pwd`
 cd "$APP_PATH"
 
 #Set the basic paths
-OUT_DIR="${APP_PATH}/../out"
+OUT_DIR="${APP_PATH}/out"
 TMP_DIR="${APP_PATH}/tmp"
 SRC_DIR="${APP_PATH}/src"
 LIB_DIR="${APP_PATH}/lib"
 LOG_FILE="${APP_PATH}/out.log"
 
 PAS_FLAGS="-O3 -vw -gl"
-SG_INC="-Fu${APP_PATH}/lib/"
+SG_INC="-Fu${LIB_DIR}/"
 
 FPC_BIN=`which fpc`
 
@@ -224,13 +224,11 @@ doWindowsCompile()
 
     echo "  ... Compiling $GAME_NAME"
 
-    LIB_DIR=`echo $LIB_DIR | sed 's/\/\(.\)\//\1:\//'`          #awk '{sub("/c/", "c:/"); print}'`
-    TMP_DIR=`echo $TMP_DIR | sed 's/\/\(.\)\//\1:\//'`          #awk '{sub("/c/", "c:/"); print}'`
-    SRC_DIR=`echo $SRC_DIR | sed 's/\/\(.\)\//\1:\//'`          #awk '{sub("/c/", "c:/"); print}'`
-    OUT_DIR=`echo $OUT_DIR | sed 's/\/\(.\)\//\1:\//'`          #awk '{sub("/c/", "c:/"); print}'`
-    SG_INC=`echo $SG_INC | sed 's/\/\(.\)\//\1:\//'`            #awk '{sub("/c/", "c:/"); print}'`
-    SG_INC=`echo $SG_INC | sed 's/\/\(.\)\//\1:\//'`            #awk '{sub("/c/", "c:/"); print}'`
-    SG_INC=`echo $SG_INC | sed 's/\/\(.\)\//\1:\//'`            #awk '{sub("/c/", "c:/"); print}'`
+    LIB_DIR=$(cygpath -w "$LIB_DIR")
+    TMP_DIR=$(cygpath -w "$TMP_DIR")
+    SRC_DIR=$(cygpath -w "$SRC_DIR")
+    OUT_DIR=$(cygpath -w "$OUT_DIR")
+    SG_INC="-Fu${LIB_DIR}/"
 
     echo "  ... Creating Resources"
     windres ${SRC_DIR}/SwinGame.rc ${SRC_DIR}/GameLauncher.res

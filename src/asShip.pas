@@ -21,7 +21,7 @@ unit asShip;
 interface
   uses sgTypes, asTypes;
 
-  procedure CreateShip(var ship: TShip; const kind: TShipKind = sk1ShipAI);
+  procedure CreateShip(var ship: TShip; const kind: TShipKind = sk1ShipPlayer);
 
   procedure ResetShip(var ship: TShip; const asteroids: TAsteroidArray; const enemy: TShip);
 
@@ -36,7 +36,7 @@ interface
 implementation
   uses sgCore, sgGeometry, sgInput, asAudio, asConstants, asDraw, sgGraphics, asEffects, asNotes, asOffscreen, asShipController, asPath, math;
 
-  procedure CreateShip(var ship: TShip; const kind: TShipKind = sk1ShipAI);
+  procedure CreateShip(var ship: TShip; const kind: TShipKind = sk1ShipPlayer);
   begin
     ship.kind := kind;
 

@@ -2307,8 +2307,7 @@ implementation
     DrawShapeOnScreen(s, true);
   end;
 
-  //SpiltCoffee's
-  //lists in big to small
+  // BEGIN MODIFICATION
   function ListResolutions(minWidth, minHeight: Integer): SizeArray; overload;
   var
     i: Integer;
@@ -2328,6 +2327,7 @@ implementation
       i += 1;
     end;
   end;
+  // END MODIFICATION
 
   function ListResolutions(): SizeArray; overload;
   begin

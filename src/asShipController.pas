@@ -87,13 +87,13 @@ implementation
       best_target.x := 0;
       best_target.y := 0;
 
-      Write('Utilities: ');
+      //Write('Utilities: ');
 
       for action in [Low(TShipAction)..High(TShipAction)] do begin
         target.x := 0;
         target.y := 0;
 
-        Write(C_ShipActionStrings[action], ', ');
+        //Write(C_ShipActionStrings[action], ', ');
 
         try
           ActionUtilFunc := GetActionUtil(action);
@@ -115,8 +115,8 @@ implementation
 
       end;
 
-      WriteLn();
-      WriteLn('Action: ', C_ShipActionStrings[best_action]);
+      //WriteLn();
+      //WriteLn('Action: ', C_ShipActionStrings[best_action]);
 
       ship.controller.action := best_action;
       ship.controller.target := best_target;

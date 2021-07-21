@@ -49,15 +49,19 @@ implementation
       title := 'Asteroids!';
       subtitle := 'By SpiltCoffee';
       selected := 0;
-      SetLength(item,4);
-      item[0].text := 'Start Game';
+      SetLength(item,6);
+      item[0].text := 'Play';
       item[0].command := Start;
-      item[1].text := 'Options';
-      item[1].command := LoadOptions;
-      item[2].text := 'High Scores';
-      item[2].command := LoadScores;
-      item[3].text := 'Quit Game';
-      item[3].command := Quit;
+      item[1].text := 'Human vs AI';
+      item[1].command := StartHumanVsAI;
+      item[2].text := 'AI vs AI';
+      item[2].command := StartAIVsAI;
+      item[3].text := 'Options';
+      item[3].command := LoadOptions;
+      item[4].text := 'High Scores';
+      item[4].command := LoadScores;
+      item[5].text := 'Quit Game';
+      item[5].command := Quit;
 
       for i := 0 to High(item) do with item[i] do
       begin
@@ -228,10 +232,10 @@ implementation
   procedure StartMenuCommand(command: MenuCommand; var state: TState; var menu: TMenu);
   begin
     case command of
-      Start: begin
+      Start, StartHumanVsAI, StartAIVsAI: begin
         state.transition := FadeOut;
         state.time := STATE_FADE_TIME;
-        state.perform := Start;
+        state.perform := command;
         menu.disabled := true;
       end;
       Resume: begin
@@ -309,7 +313,24 @@ implementation
     command := state.perform;
     state.perform := NoCommand;
     case command of
-      Start: StartGame(state,menu,player,enemy,asteroids,bullets,debris,notes);
+      Start: begin
+        state.versus := false;
+        player.kind := sk1ShipPlayer;
+        enemy.kind := sk2ShipUFO;
+        StartGame(state,menu,player,enemy,asteroids,bullets,debris,notes);
+      end;
+      StartHumanVsAI: begin
+        state.versus := true;
+        player.kind := sk1ShipPlayer;
+        enemy.kind := sk2ShipAI;
+        StartGame(state,menu,player,enemy,asteroids,bullets,debris,notes);
+      end;
+      StartAIVsAI: begin
+        state.versus := true;
+        player.kind := sk1ShipAI;
+        enemy.kind := sk2ShipAI;
+        StartGame(state,menu,player,enemy,asteroids,bullets,debris,notes);
+      end;
       GotoMain: EndGame(state,menu,player,enemy,asteroids,bullets,debris,notes);
       GameOver: begin
         menu.visible := true;

@@ -48,6 +48,7 @@ implementation
 
   function GetActionUtil(action: TShipAction): TActionUtilFunc;
   begin
+    result := nil;
     case action of
       saMoveToEnemy: begin
         result := @UtilMoveToEnemy;
@@ -72,6 +73,7 @@ implementation
 
   function GetAction(action: TShipAction): TActionProc;
   begin
+    result := nil;
     case action of
       saMoveToEnemy: begin
         result := @ActionMoveToEnemy;
@@ -250,6 +252,8 @@ implementation
     bullet_future_range: Integer;
     target_future_range: Double;
   begin
+    time := 0;
+    i := 0;
     Result := 100000;
     if ship.int = 0 then begin
       time_to_stop := Max(AITimeToTurn(ship) + AITimeToStop(ship) + AI_EVADE_BUFFER, AI_EVADE_TIME_MIN);
@@ -279,7 +283,7 @@ implementation
 
       if found and (time * AI_EVADE_STEP < BULLET_START) then begin
         bullet_future := ship.pos + (ship.vel * time * AI_EVADE_STEP);
-        bullet_future_range := trunc(BULLET_SPEED * time * AI_EVADE_STEP);
+        //bullet_future_range := trunc(BULLET_SPEED * time * AI_EVADE_STEP);
         target := asteroids[i].pos + asteroids[i].vel * time * AI_EVADE_STEP;
         target_future_range := PointPointDistance(target, bullet_future);
         Result := trunc(target_future_range * 2 + (-1 * AICalcAccuracy(ship.rot, ship.pos, target, False)) * AI_SHOOT_ACCURACY_FACTOR);

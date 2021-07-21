@@ -215,6 +215,7 @@ implementation
     end
     else begin
       WriteLn('No Node removed! Huh?!');
+      raise Exception.Create('No Node removed! Huh?!');
     end;
   end;
 

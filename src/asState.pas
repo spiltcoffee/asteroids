@@ -111,12 +111,11 @@ implementation
     end;
     if state.time > 0 then
     begin
+      fadeColor := ColorBlack;
       if state.transition = FadeIn then
         fadeColor := ColorBlack + $01000000 * Trunc(state.time / STATE_FADE_TIME * 255)
       else if state.transition = FadeOut then
-        fadeColor := ColorBlack - $01000000 * Trunc(state.time / STATE_FADE_TIME * 255)
-      else if state.quit then
-        fadeColor := ColorBlack;
+        fadeColor := ColorBlack - $01000000 * Trunc(state.time / STATE_FADE_TIME * 255);
       DrawRectangle(fadeColor,true,0,0,ScreenWidth(),ScreenHeight());
     end;
   end;

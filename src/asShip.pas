@@ -34,7 +34,7 @@ interface
   procedure DrawShip(const player: TShip);
 
 implementation
-  uses sgCore, sgGeometry, sgInput, asAudio, asConstants, asDraw, sgGraphics, asEffects, asNotes, asOffscreen, asShipController, asPath, math;
+  uses sgCore, sgGeometry, sgInput, asAudio, asConstants, asDraw, sgGraphics, asEffects, asNotes, asOffscreen, asShipController, asPath, asEnemy, math;
 
   procedure CreateShip(var ship: TShip; const kind: TShipKind = sk1ShipPlayer);
   begin

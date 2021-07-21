@@ -31,6 +31,8 @@ interface
     MenuCommand = (
       NoCommand,
       Start,
+      StartHumanVsAI,
+      StartAIVsAI,
       Resume,
       GotoMain,
       LoadMain,
@@ -100,6 +102,7 @@ type
       pos: Point2D; //for drawing things
       ignoreCollision: TCollisionArray;
       debug: Boolean;
+      versus: Boolean;
     end;
 
     TMenuItem = record

@@ -148,6 +148,7 @@ begin
   end
   else begin
     WriteLn('Invalid List Index ', pos);
+    raise Exception.CreateFmt('Invalid List Index %s', [pos]);
   end;
 end;
 

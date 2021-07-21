@@ -47,6 +47,7 @@ implementation
     angle: Double;
     point: Point2DArray;
   begin
+    result := false;
     if shooter.kind <> sk2ShipUFO then
     begin
       SetLength(bullets,Length(bullets) + 1);

@@ -10,11 +10,16 @@ No guarantees that it still compiles just yet - I'll eventually get around to es
 Enjoy!\
 \- SpiltCoffee
 
+## Requirements
+### Windows
+* FreePascal >=2.4.0 (https://www.freepascal.org/download.html)
+  * Make sure to install the Free Pascal Utilities or else `fpcres.exe` may be missing
+* cygwin/mingw32 (git-for-windows can suffice: https://gitforwindows.org/)
+
 ## Building
-
-Actually very unsure if it still builds - see [#1](https://github.com/spiltcoffee/asteroids/issues/1).
-
-Will update this section if and when I know how.
+* Clone the repository
+* Run `./build.sh`
+* Program will be output into `./out/`
 
 ## Screenshots
 

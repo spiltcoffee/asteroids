@@ -9,3 +9,15 @@ No guarantees that it still compiles just yet - I'll eventually get around to es
 
 Enjoy!\
 \- SpiltCoffee
+
+## Building
+
+Actually very unsure if it still builds - see [#1](https://github.com/spiltcoffee/asteroids/issues/1).
+
+Will update this section if and when I know how.
+
+## Screenshots
+
+![Asteroids Screenshot #1](Artwork/Asteroids!.png)
+
+![Asteroids Screenshot #2](Artwork/Asteroids!2.png)

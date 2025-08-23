@@ -1,5 +1,7 @@
 #!/bin/sh
 
+set -e -o pipefail
+
 #
 # Step 1: Detect the operating system
 #

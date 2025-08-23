@@ -106,8 +106,10 @@ implementation
       DrawText('Kills: ' + IntToStr(ship1.kills),ship1.color,smallFont,14, 10);
       DrawText('Deaths: ' + IntToStr(ship1.deaths),ship1.color,smallFont,14, 25);
 
-      DrawText('Kills: ' + IntToStr(ship2.kills),ship2.color,smallFont,14, ScreenHeight() - 40);
-      DrawText('Deaths: ' + IntToStr(ship2.deaths),ship2.color,smallFont,14, ScreenHeight() - 25);
+      if state.versus then begin
+        DrawText('Kills: ' + IntToStr(ship2.kills),ship2.color,smallFont,14, ScreenHeight() - 40);
+        DrawText('Deaths: ' + IntToStr(ship2.deaths),ship2.color,smallFont,14, ScreenHeight() - 25);
+      end;
     end;
     if state.time > 0 then
     begin

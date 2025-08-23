@@ -51,15 +51,13 @@ implementation
     LoadPauseMenu(menu);
 
     CreateShip(player, player.kind);
-    //SpawnShip(player, asteroids, enemy);
 
     if (enemy.kind = sk2ShipAI) then begin
       CreateShip(enemy, enemy.kind);
     end
     else begin
-      CreateEnemy(enemy, player, asteroids);
+      SetupEnemy(enemy);
     end;
-    //SpawnShip(enemy, asteroids, player);
 
     SetLength(asteroids,0);
 
@@ -85,13 +83,13 @@ implementation
     menu.selected := 0;
     LoadMainMenu(menu);
 
-    CreateShip(player, player.kind);
+    KillShip(player, debris);
 
     if (enemy.kind = sk2ShipAI) then begin
-      CreateShip(enemy, enemy.kind);
+      KillShip(enemy, debris);
     end
     else begin
-      CreateEnemy(enemy, player, asteroids);
+      KillEnemy(enemy, debris);
     end;
 
     SetLength(asteroids,0);

@@ -121,17 +121,20 @@ implementation
         enemy.respawn -= 1;
 
       if state.playing then begin
-
         if not player.alive and (player.respawn < PLAYER_RESPAWN_SHOW) then begin
           PlayRespawnEffect(state);
           SpawnShip(player, debris, asteroids, enemy);
         end;
 
-        if not enemy.alive and (enemy.respawn < PLAYER_RESPAWN_SHOW) then begin
-          PlayRespawnEffect(state);
-          SpawnShip(enemy, debris, asteroids, player);
+        if not enemy.alive then begin
+          if (enemy.kind = sk2ShipAI) and (enemy.respawn < PLAYER_RESPAWN_SHOW) then begin
+            PlayRespawnEffect(state);
+            SpawnShip(enemy, debris, asteroids, player);
+          end
+          else if (enemy.kind = sk2ShipUFO) and (state.enemylives > 0) then begin
+            CreateEnemy(enemy, player, asteroids);
+          end;
         end;
-
       end;
 
       while NeedMoreAsteroids(state.score, asteroids) do begin

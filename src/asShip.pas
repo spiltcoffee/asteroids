@@ -109,6 +109,7 @@ implementation
 
   procedure SpawnShip(var ship: TShip; var debris: TDebrisArray; const asteroids: TAsteroidArray; const enemy: TShip);
   begin
+    WriteLn('spawning ship!');
     ResetShip(ship, asteroids, enemy);
     ship.respawn := PLAYER_RESPAWN_SHOW;
     CreateSpawnDebris(ship, debris);
